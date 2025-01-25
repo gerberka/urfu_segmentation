@@ -19,6 +19,7 @@ source .venv/bin/activate
 Готовый датасет лежит в `/misc/home1/m_imm_freedata/Segmentation/Projects/mmseg_water/landcover.ai_512`, его уже можно использовать в mmsegmentation.
 
 Для запуска обучения на этом датасете:
+(есть несколько готовых конфигов в паке landcover, можно их юзать вместо стандарного в dist_train)
 ```sh
 cd landcover
 sh dist_train.sh
@@ -77,3 +78,15 @@ train_pipeline = [
 source .venv/bin/activate
 pip install albumentations
 ```
+
+
+## Метрики
+
+| Dataset     | PoolFormer mIoU | DDRNet mIoU | ConvNeXt mIoU    | Mask2Former mIoU |
+|-------------|-----------------|-------------|------------------|------------------|
+| LandCover   | 0.964           | 0.9124      | 0.9594           | 0.965           |
+| GLH Water   | 0.723           | 0.4474      | 0.7563           | 0.766           |
+| DeepGlobe   | 0.886           | 0.8163      | 0.877            | 0.888           |
+| LoveDA      | 0.682           | 0.5494      | 0.7155           | 0.711           |
+| RG3         | 0.722           | 0.5447      | 0.7343           | 0.775           |
+
