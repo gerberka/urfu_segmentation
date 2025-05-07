@@ -3,9 +3,34 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
-
+from scipy.ndimage import distance_transform_edt
 from mmseg.registry import MODELS
+from typing import List
 
+def compute_distance_map(gt: Tensor, idc: List[int]) -> Tensor:
+    """Вычисляет карты расстояний до границы для заданных классов.
+
+    Args:
+        gt (Tensor): Ground truth (B, 1, H, W)
+        idc (List[int]): Индексы классов
+
+    Returns:
+        Tensor: Distance maps (B, C, H, W), где C = len(idc)
+    """
+    gt_np = gt.squeeze(1).cpu().numpy()  # (B, H, W)
+    B, H, W = gt_np.shape
+    C = len(idc)
+    dist_maps = np.zeros((B, C, H, W), dtype=np.float32)
+
+    for b in range(B):
+        for i, cls in enumerate(idc):
+            posmask = gt_np[b] == cls
+            negmask = ~posmask
+            dist_out = distance_transform_edt(negmask)
+            dist_in = distance_transform_edt(posmask)
+            dist_maps[b, i] = dist_out - dist_in
+
+    return torch.from_numpy(dist_maps).to(gt.device)
 
 @MODELS.register_module()
 class BoundaryLoss(nn.Module):
@@ -25,10 +50,12 @@ class BoundaryLoss(nn.Module):
 
     def __init__(self,
                  loss_weight: float = 1.0,
+                 idc: List[int] = [1],
                  loss_name: str = 'loss_boundary'):
         super().__init__()
         self.loss_weight = loss_weight
         self.loss_name_ = loss_name
+        self.idc = idc
 
     def forward(self, bd_pre: Tensor, bd_gt: Tensor) -> Tensor:
         """Forward function.
@@ -39,23 +66,15 @@ class BoundaryLoss(nn.Module):
         Returns:
             Tensor: Loss tensor.
         """
-        log_p = bd_pre.permute(0, 2, 3, 1).contiguous().view(1, -1)
-        target_t = bd_gt.view(1, -1).float()
+        dist_maps = compute_distance_map(bd_gt, self.idc)
 
-        pos_index = (target_t == 1)
-        neg_index = (target_t == 0)
+        pc = bd_pre[:, self.idc, ...].type(torch.float32)
+        dc = dist_maps.type(torch.float32)
 
-        weight = torch.zeros_like(log_p)
-        pos_num = pos_index.sum()
-        neg_num = neg_index.sum()
-        sum_num = pos_num + neg_num
-        weight[pos_index] = neg_num * 1.0 / sum_num
-        weight[neg_index] = pos_num * 1.0 / sum_num
+        multipled = pc * dc
+        loss = multipled.mean()
 
-        loss = F.binary_cross_entropy_with_logits(
-            log_p, target_t, weight, reduction='mean')
-
-        return self.loss_weight * loss
+        return loss
 
     @property
     def loss_name(self):
