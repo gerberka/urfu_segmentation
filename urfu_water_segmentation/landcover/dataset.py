@@ -12,7 +12,7 @@ DATASET_COLORMAP = dict(
     clouds=(210, 210, 210),
 )
 
-LANDCOVER_CLASS_MAPPING = {
+WATER_CLASS_MAPPING = {
     'tree': 'background',
     'roads': 'background',
     'buildings': 'background',
@@ -35,7 +35,7 @@ CLOUDS_CLASS_MAPPING = {
 
 
 @DATASETS.register_module()
-class LandcoverAI(BaseSegDataset):
+class WaterDataset(BaseSegDataset):
     METAINFO = dict(
         classes=list(DATASET_COLORMAP.keys()),
         palette=list(DATASET_COLORMAP.values()),
@@ -46,7 +46,7 @@ class LandcoverAI(BaseSegDataset):
         self._data_label_map = {}
         
         for key, value in DATASET_COLORMAP.items():
-            new_key = LANDCOVER_CLASS_MAPPING.get(key, key)
+            new_key = WATER_CLASS_MAPPING.get(key, key)
             
             if new_key not in new_classes:
                 new_classes.append(new_key)
