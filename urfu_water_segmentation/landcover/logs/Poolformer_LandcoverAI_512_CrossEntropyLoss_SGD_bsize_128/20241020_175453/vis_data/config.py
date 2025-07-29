@@ -181,7 +181,7 @@ test_dataloader = dict(
             dict(reduce_zero_label=False, type='LoadAnnotations'),
             dict(type='PackSegInputs'),
         ],
-        type='LandcoverAI'),
+        type='WaterDataset'),
     num_workers=8,
     persistent_workers=True,
     sampler=dict(shuffle=False, type='DefaultSampler'))
@@ -229,7 +229,7 @@ train_dataloader = dict(
             dict(type='PhotoMetricDistortion'),
             dict(type='PackSegInputs'),
         ],
-        type='LandcoverAI'),
+        type='WaterDataset'),
     num_workers=8,
     persistent_workers=True,
     sampler=dict(shuffle=True, type='DefaultSampler'))
@@ -273,7 +273,7 @@ val_dataloader = dict(
             dict(reduce_zero_label=False, type='LoadAnnotations'),
             dict(type='PackSegInputs'),
         ],
-        type='LandcoverAI'),
+        type='WaterDataset'),
     num_workers=8,
     persistent_workers=True,
     sampler=dict(shuffle=False, type='DefaultSampler'))
