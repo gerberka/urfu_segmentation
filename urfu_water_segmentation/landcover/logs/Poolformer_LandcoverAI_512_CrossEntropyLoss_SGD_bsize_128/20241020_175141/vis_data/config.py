@@ -29,7 +29,7 @@ data_preprocessor = dict(
     ],
     type='SegDataPreProcessor')
 data_root = '/misc/home1/m_imm_freedata/Segmentation/Projects/mmseg_water/landcover.ai_512'
-dataset_type = 'LandcoverAI'
+dataset_type = 'WaterDataset'
 default_hooks = dict(
     checkpoint=dict(
         by_epoch=True, interval=1, max_keep_ckpts=5, type='CheckpointHook'),

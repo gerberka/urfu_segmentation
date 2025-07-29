@@ -13,7 +13,7 @@ _base_ = [
 norm_cfg = dict(type='BN', requires_grad=True)
 
 # Название датасета из файла urfu_project/dataset.py
-dataset_type = 'LandcoverAI'
+dataset_type = 'WaterDataset'
 
 # Путь к папке с преобразованным набором данных
 data_root = '/misc/home1/m_imm_freedata/Segmentation/LoveDA'
