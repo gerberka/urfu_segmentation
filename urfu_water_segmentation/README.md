@@ -2,8 +2,33 @@
 
 urfu_water_segmentation - измененная версия urfu_project. Советуем так же ознакомиться с urfu_project/README.md, тут будут только ключевые изменения.
 
+## Быстрый старт
+Заходим на кластер
+
+Выполняем команды  
+```bash
+cd _scratch2
+
+git clone git@github.com:gerberka/urfu_segmentation.git
+
+git checkout dev
+
+cd urfu_segmentation/urfu_water_segmentation
+
+# установка окружение
+sh init_venv.sh
+
+source .venv/bin/activate
+
+cd landcover
+
+# запуск обучения
+sh dist_train.sh
+```
+
+
 ## Окружение
-Зависимости зафиксированы при помощи poetry. Для полной установки окруения достаточно написать
+Зависимости зафиксированы при помощи poetry. Для полной установки окружения достаточно написать
 ```sh
 sh init_venv.sh
 ```
