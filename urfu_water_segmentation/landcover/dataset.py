@@ -33,6 +33,45 @@ CLOUDS_CLASS_MAPPING = {
     'water': 'background',
 }
 
+ROADS_CLASS_MAPPING = {
+    'water': 'background',
+    'buildings': 'background',
+    'clouds': 'background',
+    'tree': 'background',
+}
+
+
+@DATASETS.register_module()
+class RoadsDataset(BaseSegDataset):
+    METAINFO = dict(
+        classes=list(DATASET_COLORMAP.keys()),
+        palette=list(DATASET_COLORMAP.values()),
+    )
+
+    def __init__(self, **kwargs):
+        new_classes = []
+        self._data_label_map = {}
+
+        for key, value in DATASET_COLORMAP.items():
+            new_key = ROADS_CLASS_MAPPING.get(key, key)
+            if new_key not in new_classes:
+                new_classes.append(new_key)
+            self._data_label_map[value[0]] = new_classes.index(new_key)
+
+        super().__init__(
+            img_suffix=".tif",
+            seg_map_suffix=".tif",
+            metainfo={'classes': new_classes},
+            **kwargs
+        )
+
+    def get_data_info(self, idx):
+        result = super().get_data_info(idx)
+        if result is None:
+            return None
+
+        result['label_map'] = self._data_label_map.copy()
+        return result
 
 @DATASETS.register_module()
 class WaterDataset(BaseSegDataset):
@@ -67,7 +106,8 @@ class WaterDataset(BaseSegDataset):
         
         result['label_map'] = self._data_label_map.copy()
         return result
-    
+
+
 @DATASETS.register_module()
 class TreesDataset(BaseSegDataset):
     METAINFO = dict(

@@ -12,7 +12,7 @@ norm_cfg = dict(type='BN', requires_grad=True)
 # Название датасета из файла urfu_project/dataset.py
 dataset_type = 'WaterDataset'
 # Путь к папке с преобразованным набором данных
-data_root = '/misc/home1/m_imm_freedata/Segmentation/Projects/mmseg_water/landcover.ai_512'
+data_root = '/misc/home6/m_imm_freedata/Segmentation/landcover.ai_512'
 # Количество классов для сегментации
 num_classes = 2
 # Размер изображения, который принимает на вход сеть
