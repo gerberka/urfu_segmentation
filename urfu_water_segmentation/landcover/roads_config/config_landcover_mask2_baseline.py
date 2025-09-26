@@ -123,7 +123,7 @@ train_pipeline = [
     dict(type='LoadAnnotations', reduce_zero_label=False),
     dict(type='Resize', scale=crop_size, keep_ratio=False),
     dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
-    dict(type='Pad', size=crop_size, pad_val=0, seg_pad_val=255),
+    dict(type='Pad', size=crop_size, pad_val=0),
     dict(type='PackSegInputs')
 ]
 test_pipeline = [
