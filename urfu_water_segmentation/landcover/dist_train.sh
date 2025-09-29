@@ -12,4 +12,4 @@ sbatch -n1 \
     --job-name=mmsegm-water \
     --ntasks=${GPUS} \
     --ntasks-per-node=${GPUS} \
-    --wrap="python ./train.py ./config_debug.py --launcher slurm"
+    --wrap="python ./train.py ./configs_2025_05/config_trees_mask2former.py --launcher slurm"
