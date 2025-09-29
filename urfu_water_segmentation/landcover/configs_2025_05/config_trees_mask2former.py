@@ -10,7 +10,7 @@ default_scope = 'mmseg'
 # Изменение гиперпараметров
 
 # Поскольку мы используем только один графический процессор, вместо SyncBN используется BN
-norm_cfg = dict(type='BN', requires_grad=True)
+norm_cfg = dict(type='SyncBN', requires_grad=True)
 # Название датасета из файла urfu_project/dataset.py
 dataset_type = 'TreesDataset'
 # Путь к папке с преобразованным набором данных
@@ -105,8 +105,6 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 
-print("Pipilines are set", flush=True)
-
 train_dataloader = dict(
     batch_size=batch_size,
     num_workers=num_workers,
@@ -139,8 +137,6 @@ val_dataloader = dict(
         )
     )
 
-print("Dataloaders are set", flush=True)
-
 test_dataloader = val_dataloader
 val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
 test_evaluator = val_evaluator
@@ -148,5 +144,3 @@ test_evaluator = val_evaluator
 vis_backends = [dict(type='LocalVisBackend', scalar_save_file='../../scalars.json', save_dir=work_dir),
                 dict(type='TensorboardVisBackend', save_dir=work_dir)]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
-
-print("Evaluators and visualizers are set", flush=True)
