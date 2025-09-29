@@ -21,26 +21,6 @@ import time, os
 from multiprocessing import Process, Event
 from contextlib import contextmanager
 
-def _heartbeat(msg: str, interval: float, stop: Event):
-    frames = ["⣷","⣯","⣟","⡿","⢿","⣻","⣽","⣾"]  # или просто "."
-    i = 0
-    while not stop.is_set():
-        print(f"{frames[i % len(frames)]} {msg}...", flush=True)
-        time.sleep(interval)
-        i += 1
-
-@contextmanager
-def heartbeat(msg="building runner", interval=5.0):
-    stop = Event()
-    p = Process(target=_heartbeat, args=(msg, interval, stop), daemon=True)
-    p.start()
-    try:
-        yield
-    finally:
-        stop.set()
-        p.join(timeout=2)
-
-
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     parser.add_argument('config', help='train config file path')
@@ -116,69 +96,27 @@ def main():
 
     # resume training
     cfg.resume = args.resume
-    
-    print("Config is loaded", flush=True)    
 
     # Средние значения
     with open(f'{cfg.data_root}/mean_vals.txt', 'r') as file:
         lines = file.readlines()
-        
-    print("Mean and std values are read from file", flush=True)
 
     mean = [float(x) for x in lines[0].strip().split()]
     std = [float(x) for x in lines[1].strip().split()]
 
     cfg.model.data_preprocessor.mean = mean
     cfg.model.data_preprocessor.std = std
-
-    print("Mean and std values are set in config", flush=True)
-
-    from mmseg.utils import register_all_modules
-    register_all_modules(init_default_scope=True)
-
-    print("All modules are registered", flush=True)
-    
-    from mmseg.registry import MODELS, DATASETS
-    import time
-    from rich.console import Console
-    
-    t = time.perf_counter()
-    print("-> model", flush=True)
-    m = MODELS.build(cfg.model)
-    print(f"ok model in {time.perf_counter()-t:.2f}s", flush=True)
-
-    t = time.perf_counter()
-    print("-> train ds", flush=True)
-    DATASETS.build(cfg.train_dataloader['dataset'])
-    print(f"ok train ds in {time.perf_counter()-t:.2f}s", flush=True)
-    
-    t = time.perf_counter()
-    print("-> val ds", flush=True)
-    DATASETS.build(cfg.val_dataloader['dataset'])
-    print(f"ok val ds in {time.perf_counter()-t:.2f}s", flush=True)    
     
     # build the runner from config
     if 'runner_type' in cfg:
         # build the default runner
-        print("-> runner.from_cfg", flush=True)
-        t=time.perf_counter()
         runner = Runner.from_cfg(cfg)
-        print(f"ok runner in {time.perf_counter()-t:.2f}s", flush=True)
     else:
         # build customized runner from the registry
         # if 'runner_type' is set in the cfg
-        print("-> runner.from_mmseg", flush=True)
-        t = time.perf_counter()
-        with heartbeat("RUNNERS.build(cfg)", interval=1):
-            runner = RUNNERS.build(cfg)
-        print(f"ok runner in {time.perf_counter()-t:.2f}s", flush=True)
+        runner = RUNNERS.build(cfg)
 
-    print("Runner is built", flush=True)
-    # start training
-    print("-> runner.train", flush=True)
-    t=time.perf_counter()
     runner.train()
-    print(f"done train in {time.perf_counter()-t:.2f}s", flush=True)
 
 
 if __name__ == '__main__':

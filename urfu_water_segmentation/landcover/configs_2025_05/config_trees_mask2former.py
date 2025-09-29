@@ -31,7 +31,7 @@ batch_size = 16
 gradient_accumulation_steps = 8
 actual_batch_size = batch_size * gradient_accumulation_steps
 # num_workers
-num_workers = 2
+num_workers = 8
 
 # Оптимизатор
 # optimizer = dict(type='SGD', lr=1e-3, momentum=0.9, weight_decay=0.0005)
