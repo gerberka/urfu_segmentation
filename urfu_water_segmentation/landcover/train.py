@@ -128,7 +128,7 @@ def main():
     print(f"ok val ds in {time.perf_counter()-t:.2f}s", flush=True)    
     
     # build the runner from config
-    if 'runner_type' not in cfg:
+    if 'runner_type' in cfg:
         # build the default runner
         print("-> runner.from_cfg", flush=True)
         t=time.perf_counter()
