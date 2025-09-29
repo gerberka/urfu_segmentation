@@ -6,6 +6,22 @@ _base_ = [
 
 default_scope = 'mmseg'
 
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=100, val_interval=1)
+val_cfg = dict(type='ValLoop')
+test_cfg = dict(type='TestLoop')
+
+param_scheduler = [
+    dict(type='LinearLR', by_epoch=True, begin=0, end=5, start_factor=1e-3),
+    dict(type='CosineAnnealingLR', by_epoch=True, begin=5, end=100, T_max=95),
+]
+
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', by_epoch=True, interval=1,
+                    save_best='mIoU', rule='greater', max_keep_ckpts=3),
+    logger=dict(type='LoggerHook', interval=10)
+)
+
+
 # ----------------------------------------------------------------
 # Изменение гиперпараметров
 
