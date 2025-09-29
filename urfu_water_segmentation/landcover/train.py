@@ -88,10 +88,14 @@ def main():
 
     # resume training
     cfg.resume = args.resume
+    
+    print("Config is loaded", flush=True)    
 
     # Средние значения
     with open(f'{cfg.data_root}/mean_vals.txt', 'r') as file:
         lines = file.readlines()
+        
+    print("Mean and std values are read from file", flush=True)
 
     mean = [float(x) for x in lines[0].strip().split()]
     std = [float(x) for x in lines[1].strip().split()]
@@ -108,8 +112,10 @@ def main():
         # if 'runner_type' is set in the cfg
         runner = RUNNERS.build(cfg)
 
+    print("Runner is built", flush=True)
     # start training
     runner.train()
+    
 
 
 if __name__ == '__main__':

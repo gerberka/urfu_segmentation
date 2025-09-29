@@ -103,6 +103,7 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 
+print("Pipilines are set", flush=True)
 
 train_dataloader = dict(
     batch_size=batch_size,
@@ -136,6 +137,8 @@ val_dataloader = dict(
         )
     )
 
+print("Dataloaders are set", flush=True)
+
 test_dataloader = val_dataloader
 val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
 test_evaluator = val_evaluator
@@ -143,3 +146,5 @@ test_evaluator = val_evaluator
 vis_backends = [dict(type='LocalVisBackend', scalar_save_file='../../scalars.json', save_dir=work_dir),
                 dict(type='TensorboardVisBackend', save_dir=work_dir)]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
+
+print("Evaluators and visualizers are set", flush=True)
