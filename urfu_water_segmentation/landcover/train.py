@@ -126,21 +126,28 @@ def main():
     print("-> val ds", flush=True)
     DATASETS.build(cfg.val_dataloader['dataset'])
     print(f"ok val ds in {time.perf_counter()-t:.2f}s", flush=True)    
-
-
+    
     # build the runner from config
     if 'runner_type' not in cfg:
         # build the default runner
+        print("-> runner.from_cfg", flush=True)
+        t=time.perf_counter()
         runner = Runner.from_cfg(cfg)
+        print(f"ok runner in {time.perf_counter()-t:.2f}s", flush=True)
     else:
         # build customized runner from the registry
         # if 'runner_type' is set in the cfg
+        print("-> runner.from_mmseg", flush=True)
+        t=time.perf_counter()
         runner = RUNNERS.build(cfg)
+        print(f"ok runner in {time.perf_counter()-t:.2f}s", flush=True)
 
     print("Runner is built", flush=True)
     # start training
+    print("-> runner.train", flush=True)
+    t=time.perf_counter()
     runner.train()
-    
+    print(f"done train in {time.perf_counter()-t:.2f}s", flush=True)
 
 
 if __name__ == '__main__':
