@@ -105,6 +105,9 @@ def main():
 
     print("Mean and std values are set in config", flush=True)
 
+    from mmseg.utils import register_all_modules
+    register_all_modules(init_default_scope=True)
+
     from mmseg.registry import MODELS, DATASETS
     print("-> model"); MODELS.build(cfg.model); print("ok")
     print("-> train ds"); DATASETS.build(cfg.train_dataloader['dataset']); print("ok")
