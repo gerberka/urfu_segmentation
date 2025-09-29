@@ -3,7 +3,7 @@
 source ../.venv/bin/activate
 
 GPUS=2
-NODE_PARAMS="-p hiperf --gres=gpu:a100:$GPUS --nodelist=tesla-a101 -t 00:15:00"
+NODE_PARAMS="-p hiperf --gres=gpu:a100:$GPUS --nodelist=tesla-v100 -t 00:15:00"
 
 sbatch -n1 \
     --cpus-per-task=8 \
