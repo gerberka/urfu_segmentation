@@ -6,12 +6,12 @@ _base_ = [
 
 default_scope = 'mmseg'
 
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=100, val_interval=1)
-val_cfg = dict(type='ValLoop')
-test_cfg = dict(type='TestLoop')
+train_cfg = dict(_delete_=True, type='EpochBasedTrainLoop', max_epochs=100, val_interval=1)
+val_cfg = dict(_delete_=True, type='ValLoop')
+test_cfg = dict(_delete_=True, type='TestLoop')
 
 param_scheduler = [
-    dict(type='LinearLR', by_epoch=True, begin=0, end=5, start_factor=1e-3),
+    dict(_delete_=True, type='LinearLR', by_epoch=True, begin=0, end=5, start_factor=1e-3),
     dict(type='CosineAnnealingLR', by_epoch=True, begin=5, end=100, T_max=95),
 ]
 
