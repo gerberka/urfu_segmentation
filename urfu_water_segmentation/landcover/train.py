@@ -13,6 +13,33 @@ from mmseg.registry import RUNNERS
 # We must import dataset to register it
 from dataset import WaterDataset
 
+import time
+from threading import Thread, Event
+from contextlib import contextmanager
+
+@contextmanager
+def log_spinner(label="building runner", interval=5.0):
+    """
+    Печатает строку каждые `interval` секунд, пока внутри контекста идёт работа.
+    Хорошо видно в tail -f, не требует TTY.
+    """
+    stop = Event()
+
+    def loop():
+        i = 0
+        frames = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]  # или просто "."
+        while not stop.wait(interval):
+            print(f"{frames[i % len(frames)]} {label}...", flush=True)
+            i += 1
+
+    t = Thread(target=loop, daemon=True)
+    t.start()
+    try:
+        yield
+    finally:
+        stop.set()
+        t.join()
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     parser.add_argument('config', help='train config file path')
@@ -140,13 +167,11 @@ def main():
         # build customized runner from the registry
         # if 'runner_type' is set in the cfg
         print("-> runner.from_mmseg", flush=True)
-        t = time.perf_counter()
-
-        console = Console()
-        with console.status("[bold cyan]Building runner…", spinner="dots"):
+        t0 = time.perf_counter()
+        with log_spinner("building runner", interval=5):
             runner = RUNNERS.build(cfg)
+        print(f"ok runner in {time.perf_counter()-t0:.2f}s", flush=True)
 
-        print(f"ok runner in {time.perf_counter()-t:.2f}s", flush=True)
 
     print("Runner is built", flush=True)
     # start training
