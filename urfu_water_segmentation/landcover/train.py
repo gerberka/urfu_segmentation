@@ -111,7 +111,12 @@ def main():
     print("All modules are registered", flush=True)
     
     from mmseg.registry import MODELS, DATASETS
-    print("-> model"); MODELS.build(cfg.model); print("ok")
+    import time
+    t = time.perf_counter()
+    print("-> model", flush=True)
+    m = MODELS.build(cfg.model)
+    print(f"ok model in {time.perf_counter()-t:.2f}s", flush=True)
+
     print("-> train ds"); DATASETS.build(cfg.train_dataloader['dataset']); print("ok")
     print("-> val ds"); DATASETS.build(cfg.val_dataloader['dataset']); print("ok")
 
