@@ -105,6 +105,20 @@ def main():
 
     print("Mean and std values are set in config", flush=True)
 
+    from mmseg.registry import MODELS, DATASETS
+
+    print("-> Building model...", flush=True)
+    _ = MODELS.build(cfg.model)
+    print("OK model", flush=True)
+
+    print("-> Building train dataset...", flush=True)
+    _ = DATASETS.build(cfg.train_dataloader['dataset'])
+    print("OK train dataset", flush=True)
+
+    print("-> Building val dataset...", flush=True)
+    _ = DATASETS.build(cfg.val_dataloader['dataset'])
+    print("OK val dataset", flush=True)
+
     # build the runner from config
     if 'runner_type' not in cfg:
         # build the default runner
