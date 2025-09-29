@@ -103,6 +103,8 @@ def main():
     cfg.model.data_preprocessor.mean = mean
     cfg.model.data_preprocessor.std = std
 
+    print("Mean and std values are set in config", flush=True)
+
     # build the runner from config
     if 'runner_type' not in cfg:
         # build the default runner
