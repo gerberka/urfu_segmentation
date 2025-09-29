@@ -117,8 +117,15 @@ def main():
     m = MODELS.build(cfg.model)
     print(f"ok model in {time.perf_counter()-t:.2f}s", flush=True)
 
-    print("-> train ds"); DATASETS.build(cfg.train_dataloader['dataset']); print("ok")
-    print("-> val ds"); DATASETS.build(cfg.val_dataloader['dataset']); print("ok")
+    t = time.perf_counter()
+    print("-> train ds", flush=True)
+    DATASETS.build(cfg.train_dataloader['dataset'])
+    print(f"ok train ds in {time.perf_counter()-t:.2f}s", flush=True)
+    
+    t = time.perf_counter()
+    print("-> val ds", flush=True)
+    DATASETS.build(cfg.val_dataloader['dataset'])
+    print(f"ok val ds in {time.perf_counter()-t:.2f}s", flush=True)    
 
 
     # build the runner from config
