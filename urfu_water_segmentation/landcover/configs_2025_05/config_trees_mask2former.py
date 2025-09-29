@@ -1,7 +1,7 @@
 # для выбора модели, расписания необходимо наследовать один из файлов из репозитория mmsegmentation
 # базовые файлы для наследования можно посмотреть по пути mmsegmentation/configs/_base_/
 _base_ = [
-    '../../configs/mask2former/mask2former_swin-t_8xb2-160k_ade20k-512x512.py',
+    '../../../configs/mask2former/mask2former_swin-t_8xb2-160k_ade20k-512x512.py',
 ]
 
 # ----------------------------------------------------------------
