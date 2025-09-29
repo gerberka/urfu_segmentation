@@ -112,6 +112,8 @@ def main():
     
     from mmseg.registry import MODELS, DATASETS
     import time
+    from rich.console import Console
+    
     t = time.perf_counter()
     print("-> model", flush=True)
     m = MODELS.build(cfg.model)
@@ -138,8 +140,12 @@ def main():
         # build customized runner from the registry
         # if 'runner_type' is set in the cfg
         print("-> runner.from_mmseg", flush=True)
-        t=time.perf_counter()
-        runner = RUNNERS.build(cfg)
+        t = time.perf_counter()
+
+        console = Console()
+        with console.status("[bold cyan]Building runner…", spinner="dots"):
+            runner = RUNNERS.build(cfg)
+
         print(f"ok runner in {time.perf_counter()-t:.2f}s", flush=True)
 
     print("Runner is built", flush=True)
