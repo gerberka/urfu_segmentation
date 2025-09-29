@@ -11,7 +11,7 @@ val_cfg = dict(_delete_=True, type='ValLoop')
 test_cfg = dict(_delete_=True, type='TestLoop')
 
 param_scheduler = [
-    dict(_delete_=True, type='LinearLR', by_epoch=True, begin=0, end=5, start_factor=1e-3),
+    dict(type='LinearLR', by_epoch=True, begin=0, end=5, start_factor=1e-3),
     dict(type='CosineAnnealingLR', by_epoch=True, begin=5, end=100, T_max=95),
 ]
 
