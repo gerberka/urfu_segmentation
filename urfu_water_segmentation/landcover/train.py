@@ -169,7 +169,7 @@ def main():
         # if 'runner_type' is set in the cfg
         print("-> runner.from_mmseg", flush=True)
         t = time.perf_counter()
-        with heartbeat("RUNNERS.build(cfg)", interval=5):
+        with heartbeat("RUNNERS.build(cfg)", interval=1):
             runner = RUNNERS.build(cfg)
         print(f"ok runner in {time.perf_counter()-t:.2f}s", flush=True)
 
