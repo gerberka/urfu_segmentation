@@ -10,7 +10,7 @@ _base_ = [
 # Поскольку мы используем только один графический процессор, вместо SyncBN используется BN
 norm_cfg = dict(type='BN', requires_grad=True)
 # Название датасета из файла urfu_project/dataset.py
-dataset_type = 'WaterDataset'
+dataset_type = 'RoadsDataset'
 # Путь к папке с преобразованным набором данных
 data_root = '/misc/home6/m_imm_freedata/Segmentation/landcover.ai_512'
 # Количество классов для сегментации
@@ -111,7 +111,7 @@ train_dataloader = dict(
         data_root=data_root,
         data_prefix=dict(
             img_path='train/images',
-            seg_map_path='train/gt'),
+            seg_map_path='train/gt2'),
         pipeline=train_pipeline,
         # ann_file=f'{splits}/train.txt'
         )
@@ -127,7 +127,7 @@ val_dataloader = dict(
         data_root=data_root,
         data_prefix=dict(
             img_path='val/images',
-            seg_map_path='val/gt'),
+            seg_map_path='val/gt2'),
         pipeline=test_pipeline,
         # ann_file=f'{splits}/val.txt'
         )

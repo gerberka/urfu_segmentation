@@ -1,0 +1,157 @@
+{
+    "type": "Mask2FormerHead",
+    "in_channels": [
+        96,
+        192,
+        384,
+        768
+    ],
+    "strides": [
+        4,
+        8,
+        16,
+        32
+    ],
+    "feat_channels": 256,
+    "out_channels": 256,
+    "num_classes": 2,
+    "num_queries": 100,
+    "num_transformer_feat_level": 3,
+    "align_corners": false,
+    "pixel_decoder": {
+        "type": "mmdet.MSDeformAttnPixelDecoder",
+        "num_outs": 3,
+        "norm_cfg": {
+            "type": "GN",
+            "num_groups": 32
+        },
+        "act_cfg": {
+            "type": "ReLU"
+        },
+        "encoder": {
+            "num_layers": 6,
+            "layer_cfg": {
+                "self_attn_cfg": {
+                    "embed_dims": 256,
+                    "num_heads": 8,
+                    "num_levels": 3,
+                    "num_points": 4,
+                    "im2col_step": 64,
+                    "dropout": 0.0,
+                    "batch_first": true,
+                    "norm_cfg": null,
+                    "init_cfg": null
+                },
+                "ffn_cfg": {
+                    "embed_dims": 256,
+                    "feedforward_channels": 1024,
+                    "num_fcs": 2,
+                    "ffn_drop": 0.0,
+                    "act_cfg": {
+                        "type": "ReLU",
+                        "inplace": true
+                    }
+                }
+            },
+            "init_cfg": null
+        },
+        "positional_encoding": {
+            "num_feats": 128,
+            "normalize": true
+        },
+        "init_cfg": null
+    },
+    "enforce_decoder_input_project": false,
+    "positional_encoding": {
+        "num_feats": 128,
+        "normalize": true
+    },
+    "transformer_decoder": {
+        "return_intermediate": true,
+        "num_layers": 9,
+        "layer_cfg": {
+            "self_attn_cfg": {
+                "embed_dims": 256,
+                "num_heads": 8,
+                "attn_drop": 0.0,
+                "proj_drop": 0.0,
+                "dropout_layer": null,
+                "batch_first": true
+            },
+            "cross_attn_cfg": {
+                "embed_dims": 256,
+                "num_heads": 8,
+                "attn_drop": 0.0,
+                "proj_drop": 0.0,
+                "dropout_layer": null,
+                "batch_first": true
+            },
+            "ffn_cfg": {
+                "embed_dims": 256,
+                "feedforward_channels": 2048,
+                "num_fcs": 2,
+                "act_cfg": {
+                    "type": "ReLU",
+                    "inplace": true
+                },
+                "ffn_drop": 0.0,
+                "dropout_layer": null,
+                "add_identity": true
+            }
+        },
+        "init_cfg": null
+    },
+    "loss_cls": {
+        "type": "mmdet.CrossEntropyLoss",
+        "use_sigmoid": false,
+        "loss_weight": 2.0,
+        "reduction": "mean",
+        "class_weight": [
+            1.0,
+            3.0
+        ]
+    },
+    "loss_mask": {
+        "type": "mmdet.CrossEntropyLoss",
+        "use_sigmoid": true,
+        "reduction": "mean",
+        "loss_weight": 5.0
+    },
+    "loss_dice": {
+        "type": "mmdet.DiceLoss",
+        "use_sigmoid": true,
+        "activate": true,
+        "reduction": "mean",
+        "naive_dice": true,
+        "eps": 1.0,
+        "loss_weight": 5.0
+    },
+    "train_cfg": {
+        "num_points": 12544,
+        "oversample_ratio": 3.0,
+        "importance_sample_ratio": 0.75,
+        "assigner": {
+            "type": "mmdet.HungarianAssigner",
+            "match_costs": [
+                {
+                    "type": "mmdet.ClassificationCost",
+                    "weight": 2.0
+                },
+                {
+                    "type": "mmdet.CrossEntropyLossCost",
+                    "weight": 5.0,
+                    "use_sigmoid": true
+                },
+                {
+                    "type": "mmdet.DiceCost",
+                    "weight": 5.0,
+                    "pred_act": true,
+                    "eps": 1.0
+                }
+            ]
+        },
+        "sampler": {
+            "type": "mmdet.MaskPseudoSampler"
+        }
+    }
+}

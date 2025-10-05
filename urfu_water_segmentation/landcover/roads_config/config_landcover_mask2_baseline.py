@@ -58,10 +58,10 @@ model.update(
                 type='mmdet.CrossEntropyLoss',
                 use_sigmoid=False,
                 loss_weight=2.0,
-                class_weight=[1.0, 3.0]  # фон=1.0, дорога=3.0 — подбирается эмпирически
+                class_weight=[1.0, 3.0]
             ),
             loss_mask=dict(type='mmdet.CrossEntropyLoss', use_sigmoid=True, loss_weight=5.0),
-            loss_dice=dict(type='mmdet.DiceLoss', use_sigmoid=True, activate=True, eps=1.0, loss_weight=5.0),
+            loss_dice=dict(type='mmdet.DiceLoss', use_sigmoid=True, activate=True, loss_weight=5.0),
         )
     )
 )

@@ -1,15 +1,8 @@
 #!/bin/sh
 
-source ../.venv/bin/activate
-
-GPUS=2
-NODE_PARAMS="-p hiperf --gres=gpu:a100:$GPUS --nodelist=tesla-a101 -t 00:15:00"
-
-sbatch -n1 \
-    --cpus-per-task=8 \
-    --mem=45000 \
-    $NODE_PARAMS \
-    --job-name=mmsegm-water \
-    --ntasks=${GPUS} \
-    --ntasks-per-node=${GPUS} \
-    --wrap="python ./train.py ./config_debug.py --launcher slurm"
+sbatch \
+  -p hiperf --nodelist=tesla-v100 \
+  --nodes=1 --gres=gpu:v100:8 \
+  --cpus-per-task=8 --mem=45G -t 10:00:00 -J mmsegm-tree \
+  --wrap="srun torchrun --nproc_per_node=8 --master_port=23456 \
+          ./train.py ./config_landcover_mask2.py --launcher pytorch"
