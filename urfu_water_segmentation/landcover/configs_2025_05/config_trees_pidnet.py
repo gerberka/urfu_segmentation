@@ -14,7 +14,7 @@ palette = [(0, 0, 0), (0, 255, 0)]
 
 crop_size = (512, 512)
 # Поскольку мы используем только один графический процессор, вместо SyncBN используется BN (при необходимости, наоборот)
-norm_cfg = dict(type='BN', requires_grad=True)  # 1 GPU → BN
+norm_cfg = dict(type='SyncBN', requires_grad=True)  # 1 GPU → BN
 pretrained_checkpoint = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/pidnet/pidnet-s_imagenet1k_20230306-715e6273.pth'  # noqa
 
 # ====== Модель ======
