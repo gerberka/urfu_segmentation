@@ -5,11 +5,20 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
-torch = { version = "1.11.0+cu115", source = "pytorch-gpu" }
-torchvision = { version = "0.12.0+cu115", source = "pytorch-gpu" } 
+torch = [
+    { version = "1.11.0+cu115", source = "pytorch-gpu", markers = "platform_system == 'Linux' and platform_machine == 'x86_64'" },
+    { version = "2.0.1", markers = "platform_system == 'Darwin' and platform_machine == 'arm64'" }
+]
+torchvision = [
+    { version = "0.12.0+cu115", source = "pytorch-gpu", markers = "platform_system == 'Linux' and platform_machine == 'x86_64'" },
+    { version = "0.15.2", markers = "platform_system == 'Darwin' and platform_machine == 'arm64'" }
+] 
 mmsegmentation = { path = "..", develop = true }
 numpy = "^1.26"
-mmcv = { url = "https://download.openmmlab.com/mmcv/dist/cu115/torch1.11.0/mmcv-2.2.0-cp39-cp39-manylinux1_x86_64.whl" }
+mmcv = [
+    { url = "https://download.openmmlab.com/mmcv/dist/cu115/torch1.11.0/mmcv-2.2.0-cp39-cp39-manylinux1_x86_64.whl", markers = "platform_system == 'Linux' and platform_machine == 'x86_64'" },
+    { version = "2.0.0", markers = "platform_system == 'Darwin' and platform_machine == 'arm64'" }
+]
 ftfy = "^6.3.0"
 regex = "^2024.9.11"
 future = "^1.0.0"

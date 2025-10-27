@@ -1,19 +1,34 @@
 #!/bin/bash
-python3.9 -m venv .venv
+set -euo pipefail
+
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+  echo "Cannot find Python interpreter '${PYTHON_BIN}'. Set PYTHON_BIN to a valid binary." >&2
+  exit 1
+fi
+
+if [[ ! -d ".venv" ]]; then
+  "$PYTHON_BIN" -m venv .venv
+fi
+
 source .venv/bin/activate
 
-pip install -U pip
-pip install poetry==1.8.3
+python -m pip install --upgrade pip
+python -m pip install poetry==1.8.3
 
-poetry install
+poetry install --sync
 
-pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116 --default-timeout=1000
+OS_NAME="$(uname -s)"
 
-pip install mmcv==2.0.0 -f https://download.openmmlab.com/mmcv/dist/cu116/torch1.13/index.html
+if [[ "${OS_NAME}" == "Darwin" ]]; then
+  python -m pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+  python -m pip install mmcv==2.0.0
+else
+  python -m pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 \
+    --extra-index-url https://download.pytorch.org/whl/cu116 --default-timeout=1000
+  python -m pip install mmcv==2.0.0 -f https://download.openmmlab.com/mmcv/dist/cu116/torch1.13/index.html
+  export LD_LIBRARY_PATH="/opt/cuda-11.6/lib64/:${LD_LIBRARY_PATH:-}"
+fi
 
-pip install mmdet
-
-pip install future tensorboard
-pip install 'numpy<2.0.0'
-
-export LD_LIBRARY_PATH="/opt/cuda-11.6/lib64/:$LD_LIBRARY_PATH"
+python -m pip install mmdet future tensorboard 'numpy<2.0.0'
