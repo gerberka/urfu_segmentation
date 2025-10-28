@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/default_runtime.py'
+    '../../../configs/pidnet/pidnet-s_2xb6-120k_1024x1024-cityscapes.py'
 ]
 
 # The class_weight is borrowed from https://github.com/openseg-group/OCNet.pytorch/issues/14 # noqa
@@ -154,7 +154,7 @@ param_scheduler = [
 ]
 
 # training schedule for 120k
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1, max_iters=None)
 val_cfg = dict(type='ValLoop')
 test_cfg = dict(type='TestLoop')
 
