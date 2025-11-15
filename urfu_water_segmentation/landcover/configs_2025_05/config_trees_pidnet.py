@@ -103,12 +103,13 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        data_prefix=dict(img_path='train/images', seg_map_path='train/gt'),
+        data_prefix=dict(
+            img_path='train/images',
+            seg_map_path='train/gt'),
         pipeline=train_pipeline,
-        metainfo=dict(classes=classes, palette=palette)
-        # при необходимости: ann_file='splits/train.txt'
+        # ann_file=f'{splits}/train.txt'
+        )
     )
-)
 
 val_dataloader = dict(
     batch_size=batch_size,
@@ -118,12 +119,13 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        data_prefix=dict(img_path='val/images', seg_map_path='val/gt'),
+        data_prefix=dict(
+            img_path='val/images',
+            seg_map_path='val/gt'),
         pipeline=test_pipeline,
-        #metainfo=dict(classes=classes, palette=palette)
-        # при необходимости: ann_file='splits/val.txt'
+        # ann_file=f'{splits}/val.txt'
+        )
     )
-)
 
 test_dataloader = val_dataloader
 
