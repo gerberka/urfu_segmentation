@@ -5,7 +5,7 @@ source ../.venv/bin/activate
 export CUDA_HOME=${CUDA_HOME:-/usr/local/cuda-11.6}  # или твой путь
 export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$LD_LIBRARY_PATH"
 
-GPU_ID="v100" # a100, a101, v100
+GPU_ID="a100" # a100, a101, v100
 GPU_COUNT=8
 
 sbatch \
