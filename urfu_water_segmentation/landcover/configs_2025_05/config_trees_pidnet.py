@@ -120,7 +120,7 @@ val_dataloader = dict(
         data_root=data_root,
         data_prefix=dict(img_path='val/images', seg_map_path='val/gt'),
         pipeline=test_pipeline,
-        metainfo=dict(classes=classes, palette=palette)
+        #metainfo=dict(classes=classes, palette=palette)
         # при необходимости: ann_file='splits/val.txt'
     )
 )
