@@ -9,8 +9,9 @@ _base_ = [
 
 dataset_type = 'TreesDataset'
 data_root = '/misc/home6/m_imm_freedata/Segmentation/Trees/Trees_DFC_512'
-classes = ('background', 'tree')
-palette = [(0, 0, 0), (0, 255, 0)]
+num_classes = 2
+classes=('background', 'tree'),
+palette=[(0, 0, 0), (128, 128, 128)]
 
 crop_size = (512, 512)
 # Поскольку мы используем только один графический процессор, вместо SyncBN используется BN (при необходимости, наоборот)
@@ -45,7 +46,7 @@ model = dict(
         type='PIDHead',
         in_channels=128,
         channels=128,
-        num_classes=2, # `background`` and `tree`
+        num_classes=num_classes, # `background`` and `tree`
         norm_cfg=norm_cfg,
         act_cfg=dict(type='ReLU', inplace=True),
         align_corners=True,
@@ -68,7 +69,7 @@ model = dict(
 # ====== Пайплайны ======
 train_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations'),
+    dict(type='LoadAnnotations', reduce_zero_label=False),
     dict(
         type='RandomChoiceResize',
         # масштабы вокруг 512 со "склеиванием" по короткой стороне
