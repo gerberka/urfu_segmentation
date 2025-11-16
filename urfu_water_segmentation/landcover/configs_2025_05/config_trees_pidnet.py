@@ -55,11 +55,11 @@ model = dict(
                 use_sigmoid=False,
                 loss_weight=1.0),
             # OHEM (под 512x512 уменьшаем min_kept)
-            dict(
-                type='OhemCrossEntropy',
-                thres=0.9,
-                min_kept=65536,  # ~1/4 от 512*512
-                loss_weight=1.0),
+            # dict(
+            #     type='OhemCrossEntropy',
+            #     thres=0.9,
+            #     min_kept=65536,  # ~1/4 от 512*512
+            #     loss_weight=1.0),
             dict(type='BoundaryLoss', loss_weight=5.0)
         ]),
     train_cfg=dict(),
@@ -164,7 +164,7 @@ test_cfg = dict(type='TestLoop')
 val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
 test_evaluator = val_evaluator
 
-experiment_name = f'PIDNetS_Trees512_CE_OHEM_Boundary_b{batch_size}_adamw'
+experiment_name = f'PIDNetS_Trees512_CE_Boundary_b{batch_size}_adamw'
 work_dir = f'logs/{experiment_name}'
 
 vis_backends = [

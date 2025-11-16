@@ -150,6 +150,18 @@ class PIDHead(BaseDecodeHead):
 
     def loss_by_feat(self, seg_logits: Tuple[Tensor],
                      batch_data_samples: SampleList) -> dict:
+        
+        for i, data_sample in enumerate(batch_data_samples):
+            gt = data_sample.gt_sem_seg.data  # в mmseg это обычно Tensor, shape [1, H, W] или [H, W]
+            gt = gt.to(torch.long)
+
+            print(f'[{i}] gt shape:', gt.shape)
+            print(f'[{i}] gt min:', int(gt.min()), 'gt max:', int(gt.max()))
+            print(f'[{i}] unique values (truncated):', torch.unique(gt)[:20])
+            assert gt.min() >= 0, "Negative label in gt!"
+            assert gt.max() < self.num_classes, \
+                f"Label {int(gt.max())} >= num_classes={self.num_classes}"
+                
         loss = dict()
         p_logit, i_logit, d_logit = seg_logits
         sem_label, bd_label = self._stack_batch_gt(batch_data_samples)
