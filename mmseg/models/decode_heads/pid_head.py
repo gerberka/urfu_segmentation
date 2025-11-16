@@ -152,8 +152,8 @@ class PIDHead(BaseDecodeHead):
                      batch_data_samples: SampleList) -> dict:
         
         for i, data_sample in enumerate(batch_data_samples):
-        gt = data_sample.gt_sem_seg.data  # в mmseg это обычно Tensor, shape [1, H, W] или [H, W]
-        gt = gt.to(torch.long)
+            gt = data_sample.gt_sem_seg.data  # в mmseg это обычно Tensor, shape [1, H, W] или [H, W]
+            gt = gt.to(torch.long)
 
         print(f'[{i}] gt shape:', gt.shape)
         print(f'[{i}] gt min:', int(gt.min()), 'gt max:', int(gt.max()))
