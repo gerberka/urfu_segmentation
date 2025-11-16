@@ -6,6 +6,7 @@ from torch import Tensor
 from scipy.ndimage import distance_transform_edt
 from mmseg.registry import MODELS
 from typing import List
+import numpy as np
 
 def compute_distance_map(gt: Tensor, idc: List[int]) -> Tensor:
     """Вычисляет карты расстояний до границы для заданных классов.
