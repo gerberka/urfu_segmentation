@@ -168,8 +168,8 @@ experiment_name = f'PIDNetS_Trees512_CE_OHEM_Boundary_b{batch_size}_adamw'
 work_dir = f'logs/{experiment_name}'
 
 vis_backends = [
-    dict(type='LocalVisBackend', scalar_save_file='scalars.json', save_dir=work_dir),
-    dict(type='TensorboardVisBackend', save_dir=work_dir)
+    dict(type='LocalVisBackend', scalar_save_file='scalars.json'),
+    dict(type='TensorboardVisBackend')
 ]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 
