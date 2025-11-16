@@ -111,33 +111,42 @@ class WaterDataset(BaseSegDataset):
 @DATASETS.register_module()
 class TreesDataset(BaseSegDataset):
     METAINFO = dict(
-        classes=list(DATASET_COLORMAP.keys()),
-        palette=list(DATASET_COLORMAP.values()),
+        classes=('background', 'tree'),
+        palette=[(0, 0, 0), (128, 128, 128)],
     )
 
     def __init__(self, **kwargs):
-        new_classes = []
-        self._data_label_map = {}
-        
-        for key, value in DATASET_COLORMAP.items():
-            new_key = TREES_CLASS_MAPPING.get(key, key)
-            if new_key not in new_classes:
-                new_classes.append(new_key)
-            self._data_label_map[value[0]] = new_classes.index(new_key)
-        
+        # Мапим ВСЕ реальные значения в масках в {0,1}
+        # 0,32,64,96 → фон (0)
+        # 128 → дерево (1)
+        # 255 (если где-то всплывет) → тоже фон (0), чтобы не ломать num_classes=2
+        self._data_label_map = {
+            0: 0,
+            32: 0,
+            64: 0,
+            96: 0,
+            128: 1,
+            255: 0,  # НЕ игнор, а фон, чтобы не было Label 255 >= num_classes
+        }
+
         super().__init__(
-            img_suffix=".tif",
-            seg_map_suffix=".tif",
-            metainfo={'classes': new_classes},
-            **kwargs
+            img_suffix='.tif',
+            seg_map_suffix='.tif',
+            # важно: не трогаем zero-label
+            reduce_zero_label=False,
+            # ignore_index можешь оставить 255, но мы 255 уже мапим в 0
+            **kwargs,
         )
-        
+
     def get_data_info(self, idx):
         result = super().get_data_info(idx)
         if result is None:
             return None
+
+        # mmseg возьмет отсюда label_map и применит его в LoadAnnotations
         result['label_map'] = self._data_label_map.copy()
         return result
+
 
 @DATASETS.register_module()
 class CloudsDataset(BaseSegDataset):
