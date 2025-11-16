@@ -182,14 +182,24 @@ class PIDHead(BaseDecodeHead):
             align_corners=self.align_corners)
         sem_label = sem_label.squeeze(1)
         bd_label = bd_label.squeeze(1)
+        # 0: CE для P-ветки
         loss['loss_sem_p'] = self.loss_decode[0](
             p_logit, sem_label, ignore_index=self.ignore_index)
-        loss['loss_sem_i'] = self.loss_decode[1](i_logit, sem_label)
+        # 1: OHEM для I-ветки
+        loss['loss_sem_i'] = self.loss_decode[1](
+            i_logit, sem_label)
+        # 2: BoundaryLoss
         loss['loss_bd'] = self.loss_decode[2](d_logit, bd_label)
+
+        # mask по границам
         filler = torch.ones_like(sem_label) * self.ignore_index
         sem_bd_label = torch.where(
             torch.sigmoid(d_logit[:, 0, :, :]) > 0.8, sem_label, filler)
-        loss['loss_sem_bd'] = self.loss_decode[3](i_logit, sem_bd_label)
+
+        # 3: OHEM только по границам
+        loss['loss_sem_bd'] = self.loss_decode[3](
+            i_logit, sem_bd_label)
+
         loss['acc_seg'] = accuracy(
             i_logit, sem_label, ignore_index=self.ignore_index)
         return loss

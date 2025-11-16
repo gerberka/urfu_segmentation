@@ -61,7 +61,12 @@ model = dict(
                 thres=0.9,
                 min_kept=65536,  # ~1/4 от 512*512
                 loss_weight=1.0),
-            dict(type='BoundaryLoss', loss_weight=5.0)
+            dict(type='BoundaryLoss', loss_weight=5.0),
+            dict(  # loss_sem_bd — семантика только по границам
+            type='OhemCrossEntropy',
+            thres=0.9,
+            min_kept=65536,
+            loss_weight=1.0),
         ]),
     train_cfg=dict(),
     test_cfg=dict(mode='whole'))
