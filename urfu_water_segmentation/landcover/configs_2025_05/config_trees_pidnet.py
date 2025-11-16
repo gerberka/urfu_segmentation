@@ -56,11 +56,11 @@ model = dict(
                 use_sigmoid=False,
                 loss_weight=1.0),
             # OHEM (под 512x512 уменьшаем min_kept)
-            # dict(
-            #     type='OhemCrossEntropy',
-            #     thres=0.9,
-            #     min_kept=65536,  # ~1/4 от 512*512
-            #     loss_weight=1.0),
+            dict(
+                type='OhemCrossEntropy',
+                thres=0.9,
+                min_kept=65536,  # ~1/4 от 512*512
+                loss_weight=1.0),
             dict(type='BoundaryLoss', loss_weight=5.0)
         ]),
     train_cfg=dict(),
