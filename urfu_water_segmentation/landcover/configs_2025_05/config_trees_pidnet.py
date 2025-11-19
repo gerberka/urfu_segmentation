@@ -10,7 +10,7 @@ _base_ = [
 dataset_type = 'TreesDataset'
 data_root = '/misc/home6/m_imm_freedata/Segmentation/Trees/Trees_DFC_512'
 num_classes = 2
-classes=('background', 'tree'),
+classes=('background', 'tree')
 palette=[(0, 0, 0), (128, 128, 128)]
 
 crop_size = (512, 512)
@@ -25,7 +25,7 @@ data_preprocessor = dict(
     std=[58.395, 57.12, 57.375],
     bgr_to_rgb=True,
     pad_val=0,
-    seg_pad_val=0,
+    seg_pad_val=255,
     size=crop_size)
 
 model = dict(

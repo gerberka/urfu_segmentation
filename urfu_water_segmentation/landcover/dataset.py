@@ -121,12 +121,14 @@ class TreesDataset(BaseSegDataset):
         # 128 → дерево (1)
         # 255 (если где-то всплывет) → тоже фон (0), чтобы не ломать num_classes=2
         self._data_label_map = {
-            0: 0,
-            32: 0,
+            0: 0,    # background
+            32: 0,   # если у тебя такие были
             64: 0,
             96: 0,
-            128: 1,
-            255: 0,  # НЕ игнор, а фон, чтобы не было Label 255 >= num_classes
+            128: 1,  # tree
+            192: 0,  # roads -> фон
+            210: 0,  # clouds -> фон
+            255: 0,  # buildings (если в таком коде) -> фон
         }
 
         super().__init__(
