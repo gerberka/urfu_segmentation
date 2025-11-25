@@ -75,6 +75,7 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(type='Lambda', fn=lambda results: results.update(gt_seg_map=(results['gt_seg_map'] == 128).astype('uint8')) or results),
     dict(
         type='RandomChoiceResize',
         # масштабы вокруг 512 со "склеиванием" по короткой стороне
@@ -94,11 +95,12 @@ test_pipeline = [
     dict(type='Resize', scale=(512, 512), keep_ratio=True),
     dict(type='ResizeToMultiple', size_divisor=32),
     dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(type='Lambda', fn=lambda results: results.update(gt_seg_map=(results['gt_seg_map'] == 128).astype('uint8')) or results),
     dict(type='PackSegInputs')
 ]
 
 # ====== Даталоадеры ======
-batch_size = 16
+batch_size = 4
 num_workers = 8
 
 train_dataloader = dict(
