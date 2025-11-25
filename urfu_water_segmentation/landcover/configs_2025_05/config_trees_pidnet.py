@@ -75,7 +75,22 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', reduce_zero_label=False),
-    dict(type='Lambda', fn=lambda results: results.update(gt_seg_map=(results['gt_seg_map'] == 128).astype('uint8')) or results),
+    # Приводим аннотацию к 2D и бинаризуем: 128 -> 1, остальное -> 0
+    dict(
+        type='Lambda',
+        fn=lambda results: (
+            results.update(
+                gt_seg_map=(
+                    (
+                        results['gt_seg_map'][..., 0]
+                        if results['gt_seg_map'].ndim == 3
+                        else results['gt_seg_map']
+                    )
+                    == 128
+                ).astype('uint8')
+            )
+            or results
+        )),
     dict(
         type='RandomChoiceResize',
         # масштабы вокруг 512 со "склеиванием" по короткой стороне
@@ -95,7 +110,21 @@ test_pipeline = [
     dict(type='Resize', scale=(512, 512), keep_ratio=True),
     dict(type='ResizeToMultiple', size_divisor=32),
     dict(type='LoadAnnotations', reduce_zero_label=False),
-    dict(type='Lambda', fn=lambda results: results.update(gt_seg_map=(results['gt_seg_map'] == 128).astype('uint8')) or results),
+    dict(
+        type='Lambda',
+        fn=lambda results: (
+            results.update(
+                gt_seg_map=(
+                    (
+                        results['gt_seg_map'][..., 0]
+                        if results['gt_seg_map'].ndim == 3
+                        else results['gt_seg_map']
+                    )
+                    == 128
+                ).astype('uint8')
+            )
+            or results
+        )),
     dict(type='PackSegInputs')
 ]
 
