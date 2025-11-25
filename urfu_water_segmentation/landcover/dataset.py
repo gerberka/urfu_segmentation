@@ -149,6 +149,14 @@ class TreesDataset(BaseSegDataset):
         result['label_map'] = self._data_label_map.copy()
         return result
 
+    def load_data_list(self):
+        """Проставляем label_map заранее, чтобы рабочие процессы точно
+        получали маппинг масок в {0,1} при загрузке аннотаций."""
+        data_list = super().load_data_list()
+        for item in data_list:
+            item['label_map'] = self._data_label_map.copy()
+        return data_list
+
 
 @DATASETS.register_module()
 class CloudsDataset(BaseSegDataset):
