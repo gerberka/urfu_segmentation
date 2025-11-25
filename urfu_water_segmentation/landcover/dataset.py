@@ -116,20 +116,10 @@ class TreesDataset(BaseSegDataset):
     )
 
     def __init__(self, **kwargs):
-        # Мапим ВСЕ реальные значения в масках в {0,1}
-        # 0,32,64,96 → фон (0)
-        # 128 → дерево (1)
-        # 255 (если где-то всплывет) → тоже фон (0), чтобы не ломать num_classes=2
-        self._data_label_map = {
-            0: 0,    # background
-            32: 0,   # если у тебя такие были
-            64: 0,
-            96: 0,
-            128: 1,  # tree
-            192: 0,  # roads -> фон
-            210: 0,  # clouds -> фон
-            255: 0,  # buildings (если в таком коде) -> фон
-        }
+        # Мапим любое значение пикселя в маске в {0,1} чтобы не ловить
+        # `index out of bounds` в cuda: все -> фон, только 128 -> дерево.
+        self._data_label_map = {i: 0 for i in range(256)}
+        self._data_label_map[128] = 1
 
         super().__init__(
             img_suffix='.tif',
