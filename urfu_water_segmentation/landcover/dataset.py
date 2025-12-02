@@ -111,42 +111,33 @@ class WaterDataset(BaseSegDataset):
 @DATASETS.register_module()
 class TreesDataset(BaseSegDataset):
     METAINFO = dict(
-        classes=('background', 'tree'),
-        palette=[(0, 0, 0), (128, 128, 128)],
+        classes=list(DATASET_COLORMAP.keys()),
+        palette=list(DATASET_COLORMAP.values()),
     )
 
     def __init__(self, **kwargs):
-        # Мапим любое значение пикселя в маске в {0,1} чтобы не ловить
-        # `index out of bounds` в cuda: все -> фон, только 128 -> дерево.
-        self._data_label_map = {i: 0 for i in range(256)}
-        self._data_label_map[128] = 1
-
+        new_classes = []
+        self._data_label_map = {}
+        
+        for key, value in DATASET_COLORMAP.items():
+            new_key = TREES_CLASS_MAPPING.get(key, key)
+            if new_key not in new_classes:
+                new_classes.append(new_key)
+            self._data_label_map[value[0]] = new_classes.index(new_key)
+        
         super().__init__(
-            img_suffix='.tif',
-            seg_map_suffix='.tif',
-            # важно: не трогаем zero-label
-            reduce_zero_label=False,
-            # ignore_index можешь оставить 255, но мы 255 уже мапим в 0
-            **kwargs,
+            img_suffix=".tif",
+            seg_map_suffix=".tif",
+            metainfo={'classes': new_classes},
+            **kwargs
         )
-
+        
     def get_data_info(self, idx):
         result = super().get_data_info(idx)
         if result is None:
             return None
-
-        # mmseg возьмет отсюда label_map и применит его в LoadAnnotations
         result['label_map'] = self._data_label_map.copy()
         return result
-
-    def load_data_list(self):
-        """Проставляем label_map заранее, чтобы рабочие процессы точно
-        получали маппинг масок в {0,1} при загрузке аннотаций."""
-        data_list = super().load_data_list()
-        for item in data_list:
-            item['label_map'] = self._data_label_map.copy()
-        return data_list
-
 
 @DATASETS.register_module()
 class CloudsDataset(BaseSegDataset):

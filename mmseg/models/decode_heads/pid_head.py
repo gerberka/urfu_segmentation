@@ -150,7 +150,6 @@ class PIDHead(BaseDecodeHead):
 
     def loss_by_feat(self, seg_logits: Tuple[Tensor],
                      batch_data_samples: SampleList) -> dict:
-            
         loss = dict()
         p_logit, i_logit, d_logit = seg_logits
         sem_label, bd_label = self._stack_batch_gt(batch_data_samples)
@@ -171,24 +170,14 @@ class PIDHead(BaseDecodeHead):
             align_corners=self.align_corners)
         sem_label = sem_label.squeeze(1)
         bd_label = bd_label.squeeze(1)
-        # 0: CE для P-ветки
         loss['loss_sem_p'] = self.loss_decode[0](
             p_logit, sem_label, ignore_index=self.ignore_index)
-        # 1: OHEM для I-ветки
-        loss['loss_sem_i'] = self.loss_decode[1](
-            i_logit, sem_label)
-        # 2: BoundaryLoss
+        loss['loss_sem_i'] = self.loss_decode[1](i_logit, sem_label)
         loss['loss_bd'] = self.loss_decode[2](d_logit, bd_label)
-
-        # mask по границам
         filler = torch.ones_like(sem_label) * self.ignore_index
         sem_bd_label = torch.where(
             torch.sigmoid(d_logit[:, 0, :, :]) > 0.8, sem_label, filler)
-
-        # 3: OHEM только по границам
-        loss['loss_sem_bd'] = self.loss_decode[3](
-            i_logit, sem_bd_label)
-
+        loss['loss_sem_bd'] = self.loss_decode[3](i_logit, sem_bd_label)
         loss['acc_seg'] = accuracy(
             i_logit, sem_label, ignore_index=self.ignore_index)
         return loss
