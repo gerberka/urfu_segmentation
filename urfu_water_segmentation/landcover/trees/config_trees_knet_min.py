@@ -38,7 +38,6 @@ model = dict(
     data_preprocessor=data_preprocessor,
     pretrained='open-mmlab://resnet50_v1c',
     backbone=dict(
-        _delete_=True,
         type='ResNetV1c',
         depth=50,
         num_stages=4,
@@ -51,7 +50,6 @@ model = dict(
         contract_dilation=True,
     ),
     decode_head=dict(
-        _delete_=True,
         type='IterativeDecodeHead',
         num_stages=num_stages,
         kernel_update_head=[
@@ -84,7 +82,6 @@ model = dict(
             for _ in range(num_stages)
         ],
         kernel_generate_head=dict(
-            _delete_=True,
             type='UPerHead',
             in_channels=[256, 512, 1024, 2048],
             in_index=[0, 1, 2, 3],
@@ -102,7 +99,6 @@ model = dict(
         ),
     ),
     auxiliary_head=dict(
-        _delete_=True,
         type='FCNHead',
         in_channels=1024,
         in_index=2,
