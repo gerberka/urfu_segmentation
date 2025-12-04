@@ -25,7 +25,7 @@ default_hooks = dict(
 # ----------------------------------------------------------------
 # Изменение гиперпараметров
 
-# Поскольку мы используем только один графический процессор, вместо SyncBN используется BN
+# Если используем один графический процессор - BN, иначе - SyncBN
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 # Название датасета из файла urfu_project/dataset.py
 dataset_type = 'TreesDataset'
@@ -68,8 +68,20 @@ pretrained = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/swin/s
 depths = [2, 2, 18, 2]
 model = dict(
     backbone=dict(
-        depths=depths, init_cfg=dict(type='Pretrained',
-                                     checkpoint=pretrained)))
+        depths=depths),
+    decode_head=dict(
+        num_classes=num_classes,
+        loss_decode=[
+            dict(type='CrossEntropyLoss', loss_weight=1.0),
+            dict(type='MSELoss', loss_weight=1.0),
+        ],
+    ),
+    auxiliary_head=dict(
+        num_classes=num_classes,
+        loss_decode=dict(
+            type='CrossEntropyLoss', loss_weight=0.4),
+    ),
+)
 
 # set all layers in backbone to lr_mult=0.1
 # set all norm layers, position_embeding,
@@ -98,7 +110,9 @@ custom_keys.update({
 })
 # optimizer
 optim_wrapper = dict(
-    paramwise_cfg=dict(custom_keys=custom_keys, norm_decay_mult=0.0))
+    accumulative_counts=gradient_accumulation_steps,
+    paramwise_cfg=dict(custom_keys=custom_keys, norm_decay_mult=0.0),
+)
 
 train_pipeline = [
     dict(type='LoadImageFromFile'),
