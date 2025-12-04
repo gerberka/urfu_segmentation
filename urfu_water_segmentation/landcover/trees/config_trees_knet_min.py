@@ -131,7 +131,11 @@ optim_wrapper = dict(
         lr=1e-4,
         weight_decay=5e-4,
     ),
-    clip_grad=dict(max_norm=1.0, norm_type=2),
+    clip_grad=dict(
+        _delete_=True,
+        max_norm=1.0, 
+        norm_type=2
+    ),
 )
 
 # Можно оставить дефолтный schedule_80k, но для sanity-check
