@@ -1,7 +1,7 @@
 # для выбора модели, расписания необходимо наследовать один из файлов из репозитория mmsegmentation
 # базовые файлы для наследования можно посмотреть по пути mmsegmentation/configs/_base_/
 _base_ = [
-    '../../../configs/knet/configs/knet-s3_swin-t_upernet_8xb2-adamw-80k_ade20k-512x512.py',
+    '../../../configs/knet/knet-s3_swin-t_upernet_8xb2-adamw-80k_ade20k-512x512.py',
 ]
 
 default_scope = 'mmseg'
