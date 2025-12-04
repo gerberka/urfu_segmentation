@@ -33,6 +33,7 @@ dataset_type = 'TreesDataset'
 data_root = '/misc/home6/m_imm_freedata/Segmentation/Trees/Trees_DFC_512'
 # Количество классов для сегментации
 num_classes = 2
+num_stages = 3
 # Размер изображения, который принимает на вход сеть
 crop_size = (512, 512)
 # Количичество эпох для обучения
@@ -70,11 +71,17 @@ model = dict(
     backbone=dict(
         depths=depths),
     decode_head=dict(
-        num_classes=num_classes,
-        loss_decode=[
-            dict(type='CrossEntropyLoss', loss_weight=1.0),
-            dict(type='MSELoss', loss_weight=1.0),
+        # num_classes тут НЕ пишем – это IterativeDecodeHead
+        kernel_update_head=[
+            dict(num_classes=num_classes) for _ in range(num_stages)
         ],
+        kernel_generate_head=dict(
+            num_classes=num_classes,
+            loss_decode=[
+                dict(type='CrossEntropyLoss', loss_weight=1.0),
+                dict(type='MSELoss', loss_weight=1.0),
+            ],
+        ),
     ),
     auxiliary_head=dict(
         num_classes=num_classes,
