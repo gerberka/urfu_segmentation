@@ -41,7 +41,6 @@ max_epochs = 100
 # Функция потерь
 loss = [
         dict(type='CrossEntropyLoss', loss_weight=1.0),
-        dict(type='MSELoss', loss_weight=1.0)
     ]
 # Размер батча
 batch_size = 16
@@ -114,8 +113,7 @@ model = dict(
             num_classes=num_classes,
             # можешь оставить один CrossEntropyLoss, если не зайдёт MSE
             loss_decode=[
-                dict(type='CrossEntropyLoss', loss_weight=1.0),
-                dict(type='MSELoss', loss_weight=1.0),
+                dict(type='CrossEntropyLoss', loss_weight=1.0)
             ],
         ),
     ),
