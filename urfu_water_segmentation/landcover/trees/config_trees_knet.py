@@ -26,7 +26,7 @@ default_hooks = dict(
 # Изменение гиперпараметров
 
 # Если используем один графический процессор - BN, иначе - SyncBN
-norm_cfg = dict(type='SyncBN', requires_grad=True)
+norm_cfg = dict(type='BN', requires_grad=True)
 # Название датасета из файла urfu_project/dataset.py
 dataset_type = 'TreesDataset'
 # Путь к папке с преобразованным набором данных
@@ -43,7 +43,7 @@ loss = [
         dict(type='CrossEntropyLoss', loss_weight=1.0),
     ]
 # Размер батча
-batch_size = 16
+batch_size = 4
 gradient_accumulation_steps = 8
 actual_batch_size = batch_size * gradient_accumulation_steps
 # num_workers

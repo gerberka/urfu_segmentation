@@ -3,7 +3,7 @@
 source ../.venv/bin/activate
 
 GPUS=1
-NODE_PARAMS="-p hiperf --gres=gpu:a100:$GPUS --nodelist=tesla-a100 -t 02:00:00"
+NODE_PARAMS="-p hiperf --gres=gpu:v100:$GPUS --nodelist=tesla-v100 -t 10:00:00"
 
 sbatch -n1 \
     --cpus-per-task=8 \
@@ -12,4 +12,4 @@ sbatch -n1 \
     --job-name=mmsegm-tree \
     --ntasks=${GPUS} \
     --ntasks-per-node=${GPUS} \
-    --wrap="python ./train.py ./configs_2025_05/config_trees_mask2former.py --launcher slurm"
+    --wrap="python ./train.py ./trees/config_trees_knet.py --launcher slurm"
