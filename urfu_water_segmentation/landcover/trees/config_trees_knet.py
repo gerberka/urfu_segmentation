@@ -1,7 +1,7 @@
 # для выбора модели, расписания необходимо наследовать один из файлов из репозитория mmsegmentation
 # базовые файлы для наследования можно посмотреть по пути mmsegmentation/configs/_base_/
 _base_ = [
-    '../../../configs/knet/knet-s3_r50-d8_upernet_8xb2-adamw-80k_ade20k-512x512.py',
+    '../../../configs/knet/configs/knet-s3_swin-t_upernet_8xb2-adamw-80k_ade20k-512x512.py',
 ]
 
 default_scope = 'mmseg'
@@ -157,6 +157,8 @@ test_dataloader = val_dataloader
 val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
 test_evaluator = val_evaluator
 
-vis_backends = [dict(type='LocalVisBackend', scalar_save_file='../../scalars.json', save_dir=work_dir),
-                dict(type='TensorboardVisBackend', save_dir=work_dir)]
+vis_backends = [
+    dict(type='LocalVisBackend', scalar_save_file='scalars.json', save_dir=work_dir),
+    dict(type='TensorboardVisBackend', save_dir=work_dir),
+]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
