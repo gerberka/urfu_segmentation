@@ -12,4 +12,4 @@ sbatch -n1 \
     --job-name=mmsegm-tree \
     --ntasks=${GPUS} \
     --ntasks-per-node=${GPUS} \
-    --wrap="python ./train.py ./trees/config_trees_knet.py --launcher slurm"
+    --wrap="python ./train.py ./trees/config_trees_knet_min.py --launcher slurm"
