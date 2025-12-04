@@ -67,26 +67,66 @@ splits = 'splits'
 pretrained = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/swin/swin_tiny_patch4_window7_224_20220308-f41b89d3.pth'  # noqa
 
 depths = [2, 2, 18, 2]
+num_stages = 3        # как в базовом конфиге
+conv_kernel_size = 1  # как в базовом конфиге
+num_classes = 2
+
 model = dict(
+    # оставляем Swin-бекбон, только глубины меняем
     backbone=dict(
-        depths=depths),
+        depths=depths,
+    ),
+
     decode_head=dict(
-        # num_classes тут НЕ пишем – это IterativeDecodeHead
+        # 1) Полностью переопределяем kernel_update_head
         kernel_update_head=[
-            dict(num_classes=num_classes) for _ in range(num_stages)
+            dict(
+                type='KernelUpdateHead',
+                num_classes=num_classes,       
+                num_ffn_fcs=2,
+                num_heads=8,
+                num_mask_fcs=1,
+                feedforward_channels=2048,
+                in_channels=512,
+                out_channels=512,
+                dropout=0.0,
+                conv_kernel_size=conv_kernel_size,
+                ffn_act_cfg=dict(type='ReLU', inplace=True),
+                with_ffn=True,
+                feat_transform_cfg=dict(
+                    conv_cfg=dict(type='Conv2d'),
+                    act_cfg=None,
+                ),
+                kernel_updator_cfg=dict(
+                    type='KernelUpdator',
+                    in_channels=256,
+                    feat_channels=256,
+                    out_channels=256,
+                    act_cfg=dict(type='ReLU', inplace=True),
+                    norm_cfg=dict(type='LN'),
+                ),
+            )
+            for _ in range(num_stages)
         ],
+
+        # 2) А здесь **дописываем** нужные поля, остальное тянем из базы
         kernel_generate_head=dict(
             num_classes=num_classes,
+            # можешь оставить один CrossEntropyLoss, если не зайдёт MSE
             loss_decode=[
                 dict(type='CrossEntropyLoss', loss_weight=1.0),
                 dict(type='MSELoss', loss_weight=1.0),
             ],
         ),
     ),
+
+    # 3) Auxiliary head тоже переводим на 2 класса
     auxiliary_head=dict(
         num_classes=num_classes,
         loss_decode=dict(
-            type='CrossEntropyLoss', loss_weight=0.4),
+            type='CrossEntropyLoss',
+            loss_weight=0.4,
+        ),
     ),
 )
 
