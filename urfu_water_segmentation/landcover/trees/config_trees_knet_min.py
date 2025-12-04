@@ -2,9 +2,9 @@
 
 # Базовые вещи: датасет + рантайм + простый шедулер
 _base_ = [
-    'mmseg/configs/_base_/datasets/ade20k.py',      # мы переопределим ниже под твой
-    'mmseg/configs/_base_/default_runtime.py',
-    'mmseg/configs/_base_/schedules/schedule_80k.py'
+    '../../../configs/_base_/datasets/ade20k.py',      # мы переопределим ниже под твой
+    '../../../configs/_base_/default_runtime.py',
+    '../../../configs/_base_/schedules/schedule_80k.py'
 ]
 
 # ===== Общие настройки =====
