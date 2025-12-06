@@ -15,7 +15,6 @@ class EnsureSingleChannelGT(BaseTransform):
         if gt is None:
             return results
 
-        # gt может быть (H, W) или (H, W, 3)
         if isinstance(gt, np.ndarray) and gt.ndim == 3:
             gt = gt[:, :, 0]
 
