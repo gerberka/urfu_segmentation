@@ -53,8 +53,8 @@ data_preprocessor = dict(
 # MODEL
 # ----------------------------------------------------------------
 model = dict(
+    pretrained=None,
     data_preprocessor=data_preprocessor,
-
     backbone=dict(
         _delete_=True,
         type='SwinTransformer',
@@ -65,7 +65,7 @@ model = dict(
         use_abs_pos_embed=False,
         drop_path_rate=0.4,
         patch_norm=True,
-        pretrained=checkpoint_file,
+        init_cfg=dict(type='Pretrained', checkpoint=checkpoint_file),
     ),
 
     decode_head=dict(
