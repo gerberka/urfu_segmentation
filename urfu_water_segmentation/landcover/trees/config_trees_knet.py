@@ -64,11 +64,11 @@ model = dict(
     ),
 
     decode_head=dict(
-        cal_acc=False,
         type='IterativeDecodeHead',
         num_stages=3,
         kernel_generate_head=dict(
             type='UPerHead',
+            ignore_index=255,
             in_channels=[192, 384, 768, 1536],
             in_index=[0, 1, 2, 3],
             pool_scales=(1, 2, 3, 6),
@@ -163,9 +163,9 @@ model = dict(
     ),
 
     auxiliary_head=dict(
-        cal_acc=False,
         type='FCNHead',
         in_channels=768,
+        ignore_index=255,
         in_index=2,
         channels=256,
         num_convs=1,
