@@ -1,4 +1,4 @@
-_base_ = '../../configs/knet/knet-s3_swin-t_upernet_8xb2-adamw-80k_ade20k-512x512.py'
+_base_ = '../../../configs/knet/knet-s3_swin-t_upernet_8xb2-adamw-80k_ade20k-512x512.py'
 
 # ----------------------------------------------------------------
 # DATASET
