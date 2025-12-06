@@ -195,7 +195,7 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', reduce_zero_label=False),
-    dict(type='EnsureSingleChannelGT'),
+    dict(type='EnsureSingleChannelGT', ignore_index=255),
     dict(
         type='RandomResize',
         scale=(2048, 512),
@@ -212,7 +212,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='Resize', scale=(2048, 512), keep_ratio=True),
     dict(type='LoadAnnotations', reduce_zero_label=False),
-    dict(type='EnsureSingleChannelGT'),
+    dict(type='EnsureSingleChannelGT', ignore_index=255),
     dict(type='PackSegInputs'),
 ]
 
