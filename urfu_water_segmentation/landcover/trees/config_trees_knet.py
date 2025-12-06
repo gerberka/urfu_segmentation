@@ -9,10 +9,8 @@ data_root = '/misc/home6/m_imm_freedata/Segmentation/Trees/Trees_DFC_512'
 num_classes = 2
 crop_size = (512, 512)
 
-# Опционально, но очень желательно для кастомных датасетов
 metainfo = dict(
     classes=('background', 'tree'),
-    # palette можно подобрать любой удобный
     palette=[(0, 0, 0), (0, 255, 0)],
 )
 
@@ -67,7 +65,6 @@ model = dict(
         use_abs_pos_embed=False,
         drop_path_rate=0.4,
         patch_norm=True,
-        # корректный способ указать pretrained
         init_cfg=dict(type='Pretrained', checkpoint=checkpoint_file),
     ),
 
@@ -194,7 +191,6 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', reduce_zero_label=False),
-
     dict(
         type='RandomResize',
         scale=(2048, 512),
@@ -254,7 +250,7 @@ val_dataloader = dict(
 test_dataloader = val_dataloader
 
 # ----------------------------------------------------------------
-# LOOPS 
+# LOOPS
 # ----------------------------------------------------------------
 train_cfg = dict(_delete_=True, type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
 val_cfg = dict(_delete_=True, type='ValLoop')
