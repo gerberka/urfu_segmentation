@@ -11,7 +11,7 @@ crop_size = (512, 512)
 
 custom_imports = dict(
     imports=[
-        'urfu_water_segmentation.landcover.transforms.ensure_single_channel_gt'
+        'transforms.ensure_single_channel_gt'
     ],
     allow_failed_imports=False
 )
