@@ -13,6 +13,7 @@ custom_imports = dict(
     imports=[
         'transforms.debug_gt',
         'transforms.ensure_single_channel_gt'
+        'transforms.sanitize_binary_gt',
     ],
     allow_failed_imports=False
 )
@@ -198,6 +199,7 @@ train_pipeline = [
     dict(type='LoadAnnotations', reduce_zero_label=False),
     dict(type='DebugGT'),
     dict(type='EnsureSingleChannelGT'),
+    dict(type='SanitizeBinaryGT'),
     dict(
         type='RandomResize',
         scale=(2048, 512),
@@ -216,6 +218,7 @@ test_pipeline = [
     dict(type='LoadAnnotations', reduce_zero_label=False),
     dict(type='DebugGT'),
     dict(type='EnsureSingleChannelGT'),
+    dict(type='SanitizeBinaryGT'),
     dict(type='PackSegInputs'),
 ]
 
