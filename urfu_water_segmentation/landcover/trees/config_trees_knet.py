@@ -65,7 +65,7 @@ model = dict(
         use_abs_pos_embed=False,
         drop_path_rate=0.4,
         patch_norm=True,
-        init_cfg=dict(type='Pretrained', checkpoint=checkpoint_file),
+        pretrained=checkpoint_file,
     ),
 
     decode_head=dict(
