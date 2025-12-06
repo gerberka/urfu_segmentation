@@ -9,6 +9,13 @@ data_root = '/misc/home6/m_imm_freedata/Segmentation/Trees/Trees_DFC_512'
 num_classes = 2
 crop_size = (512, 512)
 
+custom_imports = dict(
+    imports=[
+        'urfu_water_segmentation.landcover.transforms.ensure_single_channel_gt'
+    ],
+    allow_failed_imports=False
+)
+
 # ----------------------------------------------------------------
 # TRAINING
 # ----------------------------------------------------------------
