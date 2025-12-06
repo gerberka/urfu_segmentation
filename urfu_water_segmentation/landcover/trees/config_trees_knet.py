@@ -9,11 +9,6 @@ data_root = '/misc/home6/m_imm_freedata/Segmentation/Trees/Trees_DFC_512'
 num_classes = 2
 crop_size = (512, 512)
 
-metainfo = dict(
-    classes=('background', 'tree'),
-    palette=[(0, 0, 0), (0, 255, 0)],
-)
-
 # ----------------------------------------------------------------
 # TRAINING
 # ----------------------------------------------------------------
@@ -221,7 +216,6 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        metainfo=metainfo,
         data_prefix=dict(
             img_path='train/images',
             seg_map_path='train/gt',
@@ -238,7 +232,6 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        metainfo=metainfo,
         data_prefix=dict(
             img_path='val/images',
             seg_map_path='val/gt',
