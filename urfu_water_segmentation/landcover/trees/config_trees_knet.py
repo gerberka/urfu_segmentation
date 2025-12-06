@@ -12,7 +12,7 @@ crop_size = (512, 512)
 custom_imports = dict(
     imports=[
         'transforms.debug_gt',
-        'transforms.ensure_single_channel_gt'
+        'transforms.ensure_single_channel_gt',
         'transforms.sanitize_binary_gt',
     ],
     allow_failed_imports=False
