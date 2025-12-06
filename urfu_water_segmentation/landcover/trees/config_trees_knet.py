@@ -64,6 +64,7 @@ model = dict(
     ),
 
     decode_head=dict(
+        cal_acc=False,
         type='IterativeDecodeHead',
         num_stages=3,
         kernel_generate_head=dict(
@@ -162,6 +163,7 @@ model = dict(
     ),
 
     auxiliary_head=dict(
+        cal_acc=False,
         type='FCNHead',
         in_channels=768,
         in_index=2,
@@ -257,6 +259,14 @@ test_evaluator = val_evaluator
 
 default_hooks = dict(
     logger=dict(type='LoggerHook', interval=log_interval),
+    checkpoint=dict(
+        type='CheckpointHook',
+        by_epoch=True,
+        interval=1,
+        save_best='mIoU',
+        rule='greater',
+        max_keep_ckpts=3,
+    ),
 )
 
 vis_backends = [
