@@ -22,7 +22,7 @@ custom_imports = dict(
 # TRAINING
 # ----------------------------------------------------------------
 max_epochs = 200
-batch_size = 4
+batch_size = 128
 num_workers = 8
 
 experiment_name = (
