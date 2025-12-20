@@ -23,8 +23,7 @@ crop_size = (512, 512)
 max_epochs = 200
 # Функция потерь
 loss = [
-        dict(type='CrossEntropyLoss', loss_weight=1.0),
-        dict(type='DiceLoss', loss_weight=1.0)
+        dict(type='FocalLoss', loss_weight=1.0)
     ]
 # Размер батча
 batch_size = 16
@@ -38,7 +37,7 @@ num_workers = 8
 # optimizer = dict(type='AdamW', lr=3e-4, weight_decay=0.001)
 
 # Параметры логирования 
-experiment_name = f'Mask2_CE_Dice_{dataset_type}_{crop_size[0]}_' + '_'.join([l['type'] for l in loss]) + f'_bsize_{actual_batch_size}'
+experiment_name = f'Mask2_swins_{dataset_type}_{crop_size[0]}_' + '_'.join([l['type'] for l in loss]) + f'_bsize_{actual_batch_size}'
 logs_dir = 'logs'
 work_dir = f'{logs_dir}/{experiment_name}'  # директория для сохранения логов
 log_interval = 10  # интервал в итерациях для печати логов
