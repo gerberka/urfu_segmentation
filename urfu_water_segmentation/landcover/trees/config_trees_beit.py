@@ -56,7 +56,7 @@ test_mode = 'slide'
 slide_stride = (426, 426)
 
 # Pretrain
-checkpoint_file = '../../../pretrain/beit_large_patch16_224_pt22k_ft22k.pth'
+checkpoint_file = '../../pretrain/beit_large_patch16_224_pt22k_ft22k.pth'
 
 # ================================================================
 # Experiment name
