@@ -12,20 +12,11 @@ data_root = '/misc/home6/m_imm_freedata/Segmentation/Trees/Trees_DFC_512'
 num_classes = 2
 crop_size = (512, 512)
 
-# (Optional, но обычно полезно для метрик/визуализации)
-metainfo = dict(
-    classes=('bg', 'tree'),
-    palette=[(0, 0, 0), (0, 255, 0)],
-)
-
 custom_imports = dict(
     imports=[
-        # transforms
         'transforms.debug_gt',
         'transforms.ensure_single_channel_gt',
         'transforms.sanitize_binary_gt',
-        # если TreesDataset кастомный и не регистрируется автоматически — добавь здесь модуль датасета
-        # 'datasets.trees_dataset',
     ],
     allow_failed_imports=False,
 )
@@ -40,7 +31,7 @@ log_interval = 10
 
 # Grad accumulation
 accumulative_counts = 2
-effective_batch_size = batch_size * accumulative_counts  # per-GPU, если не DDP. В DDP умножь ещё на world_size.
+effective_batch_size = batch_size * accumulative_counts
 
 # Optimizer / schedule params
 optimizer_type = 'AdamW'
@@ -204,17 +195,9 @@ optim_wrapper = dict(
     constructor='LayerDecayOptimizerConstructor',
     paramwise_cfg=dict(
         num_layers=layer_decay_num_layers,
-        layer_decay_rate=layer_decay_rate,
-        # если хочешь “как в офф. конфигах” для трансформеров — часто добавляют no_decay для норм/pos_embed и т.п.
-        # custom_keys={
-        #     'pos_embed': dict(decay_mult=0.0),
-        #     'cls_token': dict(decay_mult=0.0),
-        #     'norm': dict(decay_mult=0.0),
-        # }
+        layer_decay_rate=layer_decay_rate
     ),
     accumulative_counts=accumulative_counts,
-    # clip_grad часто полезен для ViT/BEiT:
-    # clip_grad=dict(max_norm=1.0, norm_type=2),
 )
 
 param_scheduler = [
@@ -276,7 +259,6 @@ train_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_prefix=dict(img_path='train/images', seg_map_path='train/gt'),
-        metainfo=metainfo,
         pipeline=train_pipeline,
     ),
 )
@@ -290,7 +272,6 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_prefix=dict(img_path='val/images', seg_map_path='val/gt'),
-        metainfo=metainfo,
         pipeline=test_pipeline,
     ),
 )
