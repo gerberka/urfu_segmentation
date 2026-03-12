@@ -3,7 +3,7 @@
 # ================================================================
 # 1) Keep KNet + Swin-L backbone
 # 2) Iter-based training loop (max_iters), AMP + grad accumulation
-# 3) Loss: Focal + Dice (decode head), keep aux CE
+# 3) Loss: Focal, keep aux CE
 # 4) Refactor: variables up top + consistent experiment naming
 # ================================================================
 
@@ -71,7 +71,7 @@ warmup_start_factor = 1e-3
 # ================================================================
 # Loss params
 # ================================================================
-loss_name = 'Focal_Dice'
+loss_name = 'Focal'
 focal_gamma = 2.0
 focal_alpha = 0.25
 
@@ -159,24 +159,15 @@ model = dict(
             channels=512,
             dropout_ratio=0.1,
             num_classes=num_classes,
-            out_channels=1,
-            threshold=0.5,
             norm_cfg=norm_cfg,
             align_corners=False,
             loss_decode=[
                 dict(
                     type='FocalLoss',
-                    use_sigmoid=True,
                     gamma=focal_gamma,
                     alpha=focal_alpha,
                     loss_weight=1.0,
-                ),
-                dict(
-                    type='DiceLoss',
-                    use_sigmoid=True,
-                    loss_weight=1.0,
-                    ignore_index=ignore_index,
-                ),
+                )
             ],
         ),
 
@@ -259,14 +250,11 @@ model = dict(
         concat_input=False,
         dropout_ratio=0.1,
         num_classes=num_classes,
-        out_channels=1,
-        threshold=0.5,
         norm_cfg=norm_cfg,
         align_corners=False,
         ignore_index=ignore_index,
         loss_decode=dict(
             type='CrossEntropyLoss',
-            use_sigmoid=True,
             loss_weight=0.4,
         ),
     ),

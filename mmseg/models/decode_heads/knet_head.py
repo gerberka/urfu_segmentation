@@ -58,7 +58,7 @@ class KernelUpdator(nn.Module):
         self.act_cfg = act_cfg
         self.norm_cfg = norm_cfg
         self.out_channels = out_channels if out_channels else in_channels
-
+ч
         self.num_params_in = self.feat_channels
         self.num_params_out = self.feat_channels
         self.dynamic_layer = nn.Linear(
