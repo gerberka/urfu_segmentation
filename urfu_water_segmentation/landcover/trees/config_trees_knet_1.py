@@ -289,7 +289,7 @@ optim_wrapper = dict(
         num_layers=layer_decay_num_layers + 2,
         decay_rate=layer_decay_rate,
         decay_type='layer_wise_vit'
-    )
+    ),
     accumulative_counts=accumulative_counts,
     clip_grad=dict(max_norm=1.0, norm_type=2),
 )
