@@ -12,6 +12,7 @@ from mmseg.registry import RUNNERS
 
 # We must import dataset to register it
 from dataset import WaterDataset
+from dataset import TreesDataset
 
 import time
 from threading import Thread, Event

@@ -1,131 +1,210 @@
-# для выбора модели, расписания необходимо наследовать один из файлов из репозитория mmsegmentation
-# базовые файлы для наследования можно посмотреть по пути mmsegmentation/configs/_base_/
-_base_ = [
-    '../../../configs/san/san-vit-b16_coco-stuff164k-640x640.py',
-    '../../../configs/_base_/default_runtime.py',
-    # '../../configs/_base_/schedules/schedule_160k.py'
-]
+# ================================================================
+# Base
+# ================================================================
+_base_ = '../../../configs/san/san-vit-l14_coco-stuff164k-640x640.py'
 
-# ----------------------------------------------------------------
-# Изменение гиперпараметров
-
-# Поскольку мы используем только один графический процессор, вместо SyncBN используется BN
-norm_cfg = dict(type='SyncBN', requires_grad=True)
-
-# Название датасета из файла urfu_project/dataset.py
+# ================================================================
+# Dataset
+# ================================================================
 dataset_type = 'TreesDataset'
-
-# Путь к папке с преобразованным набором данных
 data_root = '/misc/home6/m_imm_freedata/Segmentation/Trees/Trees_DFC_512'
 
-# Количество классов для сегментации
 num_classes = 2
+crop_size = (512, 512)
 
-# Размер изображения, который принимает на вход сеть
-crop_size = (640, 640)
+custom_imports = dict(
+    imports=[
+        'transforms.ensure_single_channel_gt',
+        'transforms.sanitize_binary_gt',
+    ],
+    allow_failed_imports=False,
+)
 
-# Количичество эпох для обучения
+# ================================================================
+# Training (high-level)
+# ================================================================
 max_epochs = 200
-
-# Функция потерь
-loss = dict(type='FocalLoss', class_weight=[0.9, 1.1])
-
-# Размер батча
-batch_size = 16
-gradient_accumulation_steps = 8
-actual_batch_size = batch_size * gradient_accumulation_steps
-
-# num_workers
+batch_size = 4
 num_workers = 8
+log_interval = 10
 
-# Оптимизатор
-# optimizer = dict(type='SGD', lr=1e-3, momentum=0.9, weight_decay=0.0005)
-optimizer=dict(
-        type='AdamW', lr=0.0001, betas=(0.9, 0.999), weight_decay=0.0001)
+accumulative_counts = 2
+effective_batch_size = batch_size * accumulative_counts
 
-# Параметры логирования 
-experiment_name = f'SAN_{dataset_type}_{crop_size[0]}_{loss["type"]}_{optimizer["type"]}_bsize_{actual_batch_size}'
+# Optimizer
+optimizer_type = 'AdamW'
+base_lr = 2e-5
+weight_decay = 0.05
+betas = (0.9, 0.999)
+
+# Warmup
+warmup_epochs = 5
+warmup_start_factor = 1e-3
+
+# Loss / ignore
+ignore_index = 255
+loss_name = 'CE'
+
+# Slide inference
+test_mode = 'slide'
+slide_stride = (426, 426)
+
+# Pretrain (тот же CLIP ViT-L/14)
+pretrained = 'https://download.openmmlab.com/mmsegmentation/v0.5/san/clip_vit-large-patch14-336_3rdparty-0b5df9cb.pth'
+
+# ================================================================
+# Experiment name
+# ================================================================
+experiment_name = (
+    f'san-vit-l14'
+    f'__ds=Trees_DFC_512'
+    f'__classes={num_classes}'
+    f'__crop={crop_size[0]}x{crop_size[1]}'
+    f'__loss={loss_name}'
+    f'__opt={optimizer_type}'
+    f'__lr={base_lr:g}'
+    f'__wd={weight_decay:g}'
+    f'__betas={betas[0]:g}-{betas[1]:g}'
+    f'__acc={accumulative_counts}'
+    f'__bs={batch_size}'
+    f'__effbs={effective_batch_size}'
+    f'__warm={warmup_epochs}ep@{warmup_start_factor:g}'
+    f'__sched=poly'
+    f'__ep={max_epochs}'
+    f'__test={test_mode}'
+    f'__stride={slide_stride[0]}x{slide_stride[1]}'
+)
+
 logs_dir = 'logs'
-work_dir = f'{logs_dir}/{experiment_name}'  # директория для сохранения логов
-log_interval = 10  # интервал в итерациях для печати логов
+work_dir = f'{logs_dir}/{experiment_name}'
 
-# Директория, где хрянятся файлы с списком изображений train и val
-splits = 'splits'
+# ================================================================
+# Preprocessor
+# ================================================================
+# mean/std будут перезаписаны из mean_vals.txt в train.py
+data_preprocessor = dict(
+    type='SegDataPreProcessor',
+    mean=[123.675, 116.28, 103.53],
+    std=[58.395, 57.12, 57.375],
+    bgr_to_rgb=True,
+    pad_val=0,
+    size=crop_size,
+    seg_pad_val=ignore_index,
+)
 
-# Имя эксперимента
-# ----------------------------------------------------------------
-# Параметры модели
-img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+# ================================================================
+# Model
+# ================================================================
+model = dict(
+    _delete_=True,
+    type='MultimodalEncoderDecoder',
+    pretrained=pretrained,
+    data_preprocessor=data_preprocessor,
+    encoder_resolution=0.7,
+    image_encoder=dict(
+        type='VisionTransformer',
+        img_size=(336, 336),
+        patch_size=14,
+        patch_pad=0,
+        embed_dims=1024,
+        num_layers=18,
+        num_heads=16,
+        out_indices=(5, 11, 17),
+    ),
+    text_encoder=dict(
+        type='CLIPTextEncoder',
+        embed_dims=768,
+        num_layers=12,
+        num_heads=12,
+        output_dims=768,
+    ),
+    decode_head=dict(
+        type='SideAdapterCLIPHead',
+        num_classes=num_classes,
+        ignore_index=ignore_index,
+        san_cfg=dict(clip_channels=1024, cfg_decoder=dict(num_heads=16)),
+        maskgen_cfg=dict(
+            num_layers=6,
+            embed_dims=1024,
+            num_heads=16,
+            out_dims=768,
+        ),
+        loss_decode=dict(
+            type='CrossEntropyLoss',
+            use_sigmoid=False,
+            loss_weight=1.0,
+        ),
+    ),
+    test_cfg=dict(mode='slide', crop_size=crop_size, stride=slide_stride),
+)
 
-# data_preprocessor = dict(size=crop_size)
+# ================================================================
+# Optimization
+# ================================================================
+optim_wrapper = dict(
+    _delete_=True,
+    type='AmpOptimWrapper',
+    optimizer=dict(
+        type=optimizer_type,
+        lr=base_lr,
+        betas=betas,
+        weight_decay=weight_decay,
+    ),
+    accumulative_counts=accumulative_counts,
+)
 
+param_scheduler = [
+    dict(
+        type='LinearLR',
+        start_factor=warmup_start_factor,
+        by_epoch=True,
+        begin=0,
+        end=warmup_epochs,
+    ),
+    dict(
+        type='PolyLR',
+        power=1.0,
+        begin=warmup_epochs,
+        end=max_epochs,
+        eta_min=0.0,
+        by_epoch=True,
+    ),
+]
 
+# ================================================================
+# Pipelines
+# ================================================================
 train_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations'),
+    dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(type='EnsureSingleChannelGT'),
+    dict(type='SanitizeBinaryGT'),
     dict(
-        type='RandomChoiceResize',
-        scales=[int(640 * x * 0.1) for x in range(5, 16)],
-        resize_type='ResizeShortestEdge',
-        max_size=2560),
-    dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=1.0),
-    dict(type='PhotoMetricDistortion'),
+        type='RandomResize',
+        scale=(2048, 512),
+        ratio_range=(0.5, 2.0),
+        keep_ratio=True,
+    ),
+    dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.5),
-    dict(type='PackSegInputs')
+    dict(type='PhotoMetricDistortion'),
+    dict(type='PackSegInputs'),
 ]
 
 test_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='ResizeShortestEdge', scale=crop_size, max_size=2560),
-    dict(type='LoadAnnotations'),
-    dict(type='PackSegInputs')
+    dict(type='Resize', scale=(2048, 512), keep_ratio=True),
+    dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(type='EnsureSingleChannelGT'),
+    dict(type='SanitizeBinaryGT'),
+    dict(type='PackSegInputs'),
 ]
 
-# ----------------------------------------------------------------
-# Параметры default_runtime
-log_processor = dict(by_epoch=True)
-# ----------------------------------------------------------------
-# Параметры scheduler
-# optimizer
-optim_wrapper = dict(
-    type='AmpOptimWrapper',
-    optimizer=optimizer,
-    paramwise_cfg=dict(
-        custom_keys={
-            'img_encoder': dict(lr_mult=0.1, decay_mult=1.0),
-            'pos_embed': dict(decay_mult=0.),
-            'cls_token': dict(decay_mult=0.),
-            'norm': dict(decay_mult=0.)
-        }),
-    loss_scale='dynamic',
-    clip_grad=dict(max_norm=0.01, norm_type=2))
-# learning policy
-param_scheduler = [
-    dict(
-        type='PolyLR',
-        eta_min=0.0,
-        power=1.0,
-        begin=0,
-        end=60000,
-        by_epoch=True,
-    )
-]
-
-train_cfg = dict(_delete_=True, type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
-val_cfg = dict(_delete_=True, type='ValLoop')
-test_cfg = dict(_delete_=True, type='TestLoop')
-# В default_hooks draw=False для того, чтобы не выводить изображения из val с результатами модели после эпохи в логи
-# Если поставить True, то увеличьте интервал до более высокого, чтоб не сохранял часто много изображений
-default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', by_epoch=True, interval=1,
-                    save_best='mIoU', rule='greater', max_keep_ckpts=3),
-    logger=dict(type='LoggerHook', interval=10)
-)
-
-# ----------------------------------------------------------------
-
+# ================================================================
+# Dataloaders
+# ================================================================
 train_dataloader = dict(
+    _delete_=True,
     batch_size=batch_size,
     num_workers=num_workers,
     persistent_workers=True,
@@ -133,15 +212,13 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        data_prefix=dict(
-            img_path='train/images',
-            seg_map_path='train/gt'),
+        data_prefix=dict(img_path='train/images', seg_map_path='train/gt'),
         pipeline=train_pipeline,
-        # ann_file=f'{splits}/train.txt'
-        )
-    )
+    ),
+)
 
 val_dataloader = dict(
+    _delete_=True,
     batch_size=batch_size,
     num_workers=num_workers,
     persistent_workers=True,
@@ -149,38 +226,50 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        data_prefix=dict(
-            img_path='val/images',
-            seg_map_path='val/gt'),
+        data_prefix=dict(img_path='val/images', seg_map_path='val/gt'),
         pipeline=test_pipeline,
-        # ann_file=f'{splits}/val.txt'
-        )
-    )
+    ),
+)
 
 test_dataloader = val_dataloader
 
+# ================================================================
+# Loops  (base использует IterBasedTrainLoop — переключаем на Epoch)
+# ================================================================
+train_cfg = dict(
+    _delete_=True,
+    type='EpochBasedTrainLoop',
+    max_epochs=max_epochs,
+    val_interval=1,
+)
+val_cfg = dict(_delete_=True, type='ValLoop')
+test_cfg = dict(_delete_=True, type='TestLoop')
+
+# ================================================================
+# Eval / logs / ckpts / vis
+# ================================================================
 val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
 test_evaluator = val_evaluator
 
-# img_ratios = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
-# tta_pipeline = [  # Test Time Augmentation (TTA)
-#     dict(type='LoadImageFromFile', file_client_args=dict(backend='disk')),
-#     dict(
-#         type='TestTimeAug',
-#         transforms=[
-#             [
-#                 dict(type='Resize', scale_factor=r, keep_ratio=True)
-#                 for r in img_ratios
-#             ],
-#             [
-#                 dict(type='RandomFlip', prob=0., direction='horizontal'),
-#                 dict(type='RandomFlip', prob=1., direction='horizontal')
-#             ], [dict(type='LoadAnnotations')], [dict(type='PackSegInputs')]
-#         ])
-# ]
-# ----------------------------------------------------------------
-# Tensorboard visualization
-vis_backends = [dict(type='LocalVisBackend', scalar_save_file='../../scalars.json', save_dir=work_dir),
-                dict(type='TensorboardVisBackend', save_dir=work_dir)]
-visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
-# ----------------------------------------------------------------
+default_hooks = dict(
+    logger=dict(type='LoggerHook', interval=log_interval),
+    checkpoint=dict(
+        type='CheckpointHook',
+        by_epoch=True,
+        interval=1,
+        save_best='mIoU',
+        rule='greater',
+        max_keep_ckpts=3,
+    ),
+)
+
+vis_backends = [
+    dict(type='LocalVisBackend', save_dir=work_dir),
+    dict(type='TensorboardVisBackend', save_dir=work_dir),
+]
+
+visualizer = dict(
+    type='SegLocalVisualizer',
+    vis_backends=vis_backends,
+    name='visualizer',
+)
