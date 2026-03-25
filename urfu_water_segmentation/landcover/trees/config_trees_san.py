@@ -77,6 +77,7 @@ experiment_name = (
 
 logs_dir = 'logs'
 work_dir = f'{logs_dir}/{experiment_name}'
+find_unused_parameters = True
 
 # ================================================================
 # Preprocessor
