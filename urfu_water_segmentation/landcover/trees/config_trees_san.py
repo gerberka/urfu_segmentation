@@ -179,12 +179,28 @@ model = dict(
                 ],
             ),
         ),
-        loss_decode=dict(
-            type='CrossEntropyLoss',
-            use_sigmoid=False,
-            loss_weight=1.0,
-            loss_name='loss_cls_ce',
-        ),
+        loss_decode=[
+            dict(
+                type='CrossEntropyLoss',
+                loss_name='loss_cls_ce',
+                loss_weight=2.0,
+                class_weight=[1.0] * num_classes + [0.1],
+            ),
+            dict(
+                type='CrossEntropyLoss',
+                use_sigmoid=True,
+                loss_name='loss_mask_ce',
+                loss_weight=5.0,
+            ),
+            dict(
+                type='DiceLoss',
+                ignore_index=None,
+                naive_dice=True,
+                eps=1,
+                loss_name='loss_mask_dice',
+                loss_weight=5.0,
+            ),
+        ],
     ),
     test_cfg=dict(mode='slide', crop_size=crop_size, stride=slide_stride),
 )
