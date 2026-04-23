@@ -290,7 +290,7 @@ class FocalLoss(nn.Module):
                     if num_classes == 1:
                         target = target[:, 1]
                     else:
-                        target = target[:, num_classes]
+                        target = target[:, :num_classes]
                 else:
                     valid_mask = (target.argmax(dim=1) != ignore_index).view(
                         -1, 1)
