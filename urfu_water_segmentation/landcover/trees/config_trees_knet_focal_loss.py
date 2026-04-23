@@ -11,6 +11,7 @@ crop_size = (512, 512)
 
 custom_imports = dict(
     imports=[
+        'dataset',
         'transforms.debug_gt',
         'transforms.ensure_single_channel_gt',
         'transforms.sanitize_binary_gt',
@@ -26,7 +27,7 @@ batch_size = 4
 num_workers = 8
 
 experiment_name = (
-    f'KNet_SwinL_TreesDS_CE_{num_classes}cls_{crop_size[0]}crop_AdamW_{max_iters}ep'
+    f'KNet_SwinL_TreesDS_Focal_{num_classes}cls_{crop_size[0]}crop_AdamW_{max_iters}iter'
 )
 logs_dir = 'logs'
 work_dir = f'{logs_dir}/{experiment_name}'
@@ -294,7 +295,9 @@ val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
 test_evaluator = val_evaluator
 
 default_hooks = dict(
-    logger=dict(type='LoggerHook', interval=log_interval),
+    logger=dict(type='LoggerHook', 
+                interval=log_interval,
+                log_metric_by_epoch=False,),
     checkpoint=dict(
         type='CheckpointHook',
         by_epoch=False,
