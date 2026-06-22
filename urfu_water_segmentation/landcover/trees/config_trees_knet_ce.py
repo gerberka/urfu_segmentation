@@ -26,7 +26,7 @@ batch_size = 4
 num_workers = 8
 
 experiment_name = (
-    f'KNet_SwinL_TreesDS_CE_{num_classes}cls_{crop_size[0]}crop_AdamW_{max_epochs}ep_v2'
+    f'KNet_SwinL_TreesDS_CE_{num_classes}cls_{crop_size[0]}crop_AdamW_{max_epochs}ep'
 )
 logs_dir = 'logs'
 work_dir = f'{logs_dir}/{experiment_name}'
